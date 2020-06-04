@@ -10,11 +10,26 @@ namespace BodyCore.Controllers
 {
 	public class InterpolationController : Controller
 	{
+		List<AgeGenderFatNorm> objList = new List<AgeGenderFatNorm>(){
+			new AgeGenderFatNorm(new float[5] { 20f, 24f, 28f, 33f, 39f }, 16, 40, "Женщина"),
+			new AgeGenderFatNorm(new float[5] { 22f, 26f, 30f, 34f, 40f }, 40, 60, "Женщина"),
+			new AgeGenderFatNorm(new float[5] { 23f, 28f, 32f, 36f, 42f }, 60, 80, "Женщина"),
+			new AgeGenderFatNorm(new float[5] { 7f, 11f, 16f, 20f, 25f }, 16, 40, "Мужчина"),
+			new AgeGenderFatNorm(new float[5] { 10f, 14f, 18f, 22f, 28f }, 40, 60, "Мужчина"),
+			new AgeGenderFatNorm(new float[5] { 12f, 16f, 20f, 25f, 30f }, 60, 80, "Мужчина")};
+
 		[HttpGet]
 		public IActionResult Input()
 		{
 			List<KbguListViewModel> kbguList = new List<KbguListViewModel>() { new KbguListViewModel { Week = 0, Kbgu = 0 } }; 
 			List<WeightListViewModel> weightList = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0} };
+
+			List<WeightListViewModel> underfatZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
+			List<WeightListViewModel> athleticZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
+			List<WeightListViewModel> fitZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
+			List<WeightListViewModel> healthyZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
+			List<WeightListViewModel> overfatZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
+			List<WeightListViewModel> obeseZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
 
 			ListsResults lst = new ListsResults();
 			ArrayResults arr = new ArrayResults();
@@ -22,11 +37,19 @@ namespace BodyCore.Controllers
 			
 			lst.WeightValues = weightList;
 			lst.KbguValues = kbguList;
+			lst.UnderfatZone = underfatZone;
+			lst.AthleticZone = athleticZone;
+			lst.FitZone = fitZone;
+			lst.HealthyZone = healthyZone;
+			lst.OverfatZone = overfatZone;
+			lst.ObeseZone = obeseZone;
+
 			obj.listsResults = lst;
 			obj.arrayResults = arr;
 
 			return View(obj);
 		}
+
 
 		[HttpPost]
 		public IActionResult Input( bool disclaimer, float height, float weight, float dream_weight, float age, string gender, string activity )
@@ -66,6 +89,15 @@ namespace BodyCore.Controllers
 				ListsResults lst = new ListsResults();
 				ResultListViewModel obj = new ResultListViewModel();
 
+				List<WeightListViewModel> underfatZone = new List<WeightListViewModel>();
+				List<WeightListViewModel> athleticZone = new List<WeightListViewModel>();
+				List<WeightListViewModel> fitZone = new List<WeightListViewModel>();
+				List<WeightListViewModel> healthyZone = new List<WeightListViewModel>();
+				List<WeightListViewModel> overfatZone = new List<WeightListViewModel>();
+				List<WeightListViewModel> obeseZone = new List<WeightListViewModel>();
+				
+				AgeGenderFatNorm destObj = new AgeGenderFatNorm();
+
 				weightList.Add(new WeightListViewModel { Week = 1, Weight = weight });
 				kbgu = mKBGU.getKBGU(weight, height, age, gender, activity)[0];
 				protein = mKBGU.getKBGU(weight, height, age, gender, activity)[1];
@@ -73,6 +105,67 @@ namespace BodyCore.Controllers
 				carbohydrate = mKBGU.getKBGU(weight, height, age, gender, activity)[3];
 				kbguList.Add(new KbguListViewModel { Week = 1, Kbgu = kbgu, Protein = protein, Fat = fat, Carbohydrate = carbohydrate });
 				fatPercent = mKBGU.fatPercent(height, weight, gender);
+				foreach ( var iter in objList )
+				{
+					if ( age >= iter.AgeMin && age < iter.AgeMax && gender == iter.Gender )
+					{
+						destObj = iter;
+						if ( fatPercent <= destObj.FatIntervals[0] )
+						{
+							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+						}
+						else if ( fatPercent > destObj.FatIntervals[0] && fatPercent <= destObj.FatIntervals[1] )
+						{
+							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+						}
+						else if ( fatPercent > destObj.FatIntervals[1] && fatPercent <= destObj.FatIntervals[2] )
+						{
+							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							fitZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+						}
+						else if ( fatPercent > destObj.FatIntervals[2] && fatPercent <= destObj.FatIntervals[3] )
+						{
+							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+						}
+						else if ( fatPercent > destObj.FatIntervals[3] && fatPercent <= destObj.FatIntervals[4] )
+						{
+							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+						}
+						else if ( fatPercent > destObj.FatIntervals[4] )
+						{
+							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
+							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+						}
+					}
+				}
 				fatParcentList.Add(new FatListViewModel { Week = 1, Fat = fatPercent });
 
 				int week = 1;
@@ -84,6 +177,67 @@ namespace BodyCore.Controllers
 					weightList.Add(new WeightListViewModel { Week = week, Weight = weight });
 
 					fatPercent = mKBGU.fatPercent(height, weight, gender);
+					foreach ( var iter in objList )
+					{
+						if ( age >= iter.AgeMin && age < iter.AgeMax && gender == iter.Gender )
+						{
+							destObj = iter;
+							if ( fatPercent <= destObj.FatIntervals[0] )
+							{
+								underfatZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+							}
+							else if ( fatPercent > destObj.FatIntervals[0] && fatPercent <= destObj.FatIntervals[1] )
+							{
+								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								athleticZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+							}
+							else if ( fatPercent > destObj.FatIntervals[1] && fatPercent <= destObj.FatIntervals[2] )
+							{
+								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								fitZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+							}
+							else if ( fatPercent > destObj.FatIntervals[2] && fatPercent <= destObj.FatIntervals[3] )
+							{
+								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								healthyZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+							}
+							else if ( fatPercent > destObj.FatIntervals[3] && fatPercent <= destObj.FatIntervals[4] )
+							{
+								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								overfatZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+							}
+							else if ( fatPercent > destObj.FatIntervals[4] )
+							{
+								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
+								obeseZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+							}
+						}
+					}
 					fatParcentList.Add(new FatListViewModel { Week = week, Fat = fatPercent });
 
 					kbgu = ( 1 - mKBGU.getKBGUrecession(fatPercent, gender) ) * mKBGU.getKBGU(weight, height, age, gender, activity)[0];
@@ -97,6 +251,17 @@ namespace BodyCore.Controllers
 						criticalWeight = weight;
 				}
 				while ( ( ( gender == "Женщина" && fatPercent > 15f ) || ( gender == "Мужчина" && fatPercent > 6.5f ) ) && weight > dream_weight );
+
+				//уходит ли график в зону истощения
+				float limitWeight = 0;
+				foreach (var t in underfatZone )
+				{
+					if(t.Weight != 0 )
+					{
+						limitWeight = t.Weight;
+						break;
+					}
+				}
 
 				arr.WeeksValues = new float[week];
 				arr.date = new string[week];
@@ -143,6 +308,13 @@ namespace BodyCore.Controllers
 				lst.WeightValues = weightList;
 				lst.KbguValues = kbguList;
 
+				lst.UnderfatZone = underfatZone;
+				lst.AthleticZone = athleticZone;
+				lst.FitZone = fitZone;
+				lst.HealthyZone = healthyZone;
+				lst.OverfatZone = overfatZone;
+				lst.ObeseZone = obeseZone;
+
 				obj.listsResults = lst;
 				obj.arrayResults = arr;
 
@@ -154,6 +326,7 @@ namespace BodyCore.Controllers
 				obj.InputDreamWeight = dream_weight == 0 ? "" : dream_weight.ToString();
 				obj.AvailableWeight = criticalWeight == 0 ? "" : criticalWeight.ToString();
 				obj.WeeksCount = week.ToString();
+				obj.InUnderfatZone = limitWeight == 0 ? "" : $"Рекомендуем не снижать вес до области истощения. Ваш предельный вес составляет {Math.Round(limitWeight,2)}";
 
 				return View(obj);
 			}

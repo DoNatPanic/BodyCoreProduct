@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using BodyCore.Data.Models;
 using BodyCore.Models;
@@ -23,21 +24,13 @@ namespace BodyCore.Controllers
 				"Рекомендуем подкорректировать форму, воспользовавшись нашим помощником по снижению веса.",
 				"Рекомендуем подкорректировать форму, воспользовавшись нашим помощником по снижению веса."};
 
-
-		private static float[] intervals1 = new float[5] { 20f, 24f, 28f, 33f, 39f };
-		private static float[] intervals2 = new float[5] { 22f, 26f, 30f, 34f, 40f }; 
-		private static float[] intervals3 = new float[5] { 23f, 28f, 32f, 36f, 42f };
-		private static float[] intervals4 = new float[5] { 7f, 11f, 16f, 20f, 25f };
-		private static float[] intervals5 = new float[5] { 10f, 14f, 18f, 22f, 28f };
-		private static float[] intervals6 = new float[5] { 12f, 16f, 20f, 25f, 30f };
-
 		List<AgeGenderFatNorm> objList = new List<AgeGenderFatNorm>(){
-			new AgeGenderFatNorm(intervals1, 16, 40, "Женщина"),
-			new AgeGenderFatNorm(intervals2, 40, 60, "Женщина"),
-			new AgeGenderFatNorm(intervals3, 60, 80, "Женщина"),
-			new AgeGenderFatNorm(intervals4, 16, 40, "Мужчина"),
-			new AgeGenderFatNorm(intervals5, 40, 60, "Мужчина"),
-			new AgeGenderFatNorm(intervals6, 60, 80, "Мужчина")
+			new AgeGenderFatNorm(new float[5] { 20f, 24f, 28f, 33f, 39f }, 16, 40, "Женщина"),
+			new AgeGenderFatNorm(new float[5] { 22f, 26f, 30f, 34f, 40f }, 40, 60, "Женщина"),
+			new AgeGenderFatNorm(new float[5] { 23f, 28f, 32f, 36f, 42f }, 60, 80, "Женщина"),
+			new AgeGenderFatNorm(new float[5] { 7f, 11f, 16f, 20f, 25f }, 16, 40, "Мужчина"),
+			new AgeGenderFatNorm(new float[5] { 10f, 14f, 18f, 22f, 28f }, 40, 60, "Мужчина"),
+			new AgeGenderFatNorm(new float[5] { 12f, 16f, 20f, 25f, 30f }, 60, 80, "Мужчина")
 	};
 
 		[HttpGet]

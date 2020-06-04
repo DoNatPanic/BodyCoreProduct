@@ -1,4 +1,5 @@
 ﻿using BodyCore.Models;
+using System.Collections.Generic;
 
 namespace BodyCore.ViewModels
 {
@@ -15,5 +16,6 @@ namespace BodyCore.ViewModels
 		public string InputGender { get; set; } = "";
 		public string InputActivity { get; set; } = "";
 		public string WeeksCount { get; set; } = "";
+		public string InUnderfatZone { get; set; } = "";
 	}
 }
