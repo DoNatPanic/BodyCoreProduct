@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/StyleSheet.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="backface-visibility:visible; background-color:#6b4b3e">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Home/Index">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Analize/GetAnalize">Калькулятор нормы</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Interpolation/Input">План снижения веса</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div>
+        @RenderBody()
+    </div>
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+        <p class="mb-1">weightdecreaseline@gmail.com</p>
+    </footer>
+    <script src="~/js/bootstrap.min.js"></script>
+</body>
+</html>

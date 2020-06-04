@@ -1,0 +1,288 @@
+﻿@model CommonReportViewModel
+@{
+    var XLabels = Newtonsoft.Json.JsonConvert.SerializeObject(Model.CommonModel.FirstOrDefault().LstData.Select(x => x.DimensionOne).ToList());
+    var YValues = Newtonsoft.Json.JsonConvert.SerializeObject(Model.CommonModel.Select(x => x.LstData.Select(w => w.Quantity)).ToList());
+    var Colors = Newtonsoft.Json.JsonConvert.SerializeObject(Model.CommonModel.Select(x => x.LstData.Select(w => w.ColorRGB)).ToList());
+    var label2 = Newtonsoft.Json.JsonConvert.SerializeObject(Model.CommonModel.Select(x => x.StackedDimensionOne).ToList());
+}
+
+<div class="container">
+    <div class="jumbotron p-4 p-md-5 rounded" style="margin-top:80px; background-color: #ffffff">
+        <div class="text-justify">
+            <h2 class="featurette-heading" style="color:#8B4513">Калькулятор нормы</h2>
+            <div class="row featurette">
+                <div class="col-md-7 ">
+                    <p class="lead">
+                        Здесь вы сможете рассчитать процент жира в вашем организме. Для чего это делается?
+                        На основании этого показателя людей относят к одной из 6 категорий по типу телосложения:
+                        <ul class="lead">
+                            <li>Истощение</li>
+                            <li>Атлетическое телосложение</li>
+                            <li>Хорошая физическая форма</li>
+                            <li>Средний уровень жира</li>
+                            <li>Наличие лишнего веса</li>
+                            <li>Ожирение</li>
+                        </ul>
+                    </p>
+                </div>
+                <div class="col-md-5">
+                    <img src="~/img/calculate.jpg" style="max-width:500px" />
+                </div>
+            </div>
+            <div>
+                <p class="lead">
+                    Оказывается, существует два типа жировой ткани в организме:
+                    <ul class="lead">
+                        <li>
+                            подкожный (абдоминальный) жир - не опасен для здоровья, разве что портит фигуру и доставляет дискомфорт
+                        </li>
+                        <li>
+                            висцеральный жир (окружает внутренние органы) - по-настоящему опасен и может привести к серьезным заболеваниям
+                        </li>
+                    </ul>
+                </p>
+                <p class="lead">
+                    Ниже представлены две формы ввода данных.
+                    <ul class="lead">
+                        <li>
+                            Упрощенная форма (без показателей объемов тела) подойдет на людей,
+                            которые не занимаются профессиональным спортом, то есть имеют стандартное
+                            соотношение мышечной и жировой ткани в теле.
+                            Упрощенная форма не определяет висцеральный жир.
+                        </li>
+                        <li>
+                            Сложная форма (три доп. поля ввода для шеи, талии и бедер) использует более сложный алгоритм подсчета,
+                            который имеет погрешность на 2-3%, что дает точный результат.
+                            Это особенно актально для спортсменов, чье тело может иметь большую массу, но небольшой процент жира.
+                            Дополнительно, вы узнаете, не превышен ли уровень висцерального жира в организме.
+                        </li>
+                    </ul>
+                </p>
+            </div>
+            <hr class="mb-4"><br>
+
+            <div class="row">
+                <div class="col-md-4 order-md-2 mb-4">
+                    <h2 class="d-flex justify-content-between align-items-center mb-3">
+                        <span style="color:#9BB67C">Данные</span>
+                    </h2>
+
+
+                    <form method="post" action="">
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Рост (см)</h6>
+                                </div>
+                                <span class="text-muted">@Html.Raw(Model.InputHeight)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Масса (кг)</h6>
+                                </div>
+                                <span class="text-muted">@Html.Raw(Model.InputWeight)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Пол</h6>
+                                </div>
+                                <span class="text-muted">@Html.Raw(Model.InputGender)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Возраст (лет)</h6>
+                                </div>
+                                <span class="text-muted">@Html.Raw(Model.InputAge)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Объем шеи (см)</h6>
+                                </div>
+                                <span class="text-muted">@Html.Raw(Model.InputNeck)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Объем талии (см)</h6>
+                                </div>
+                                <span class="text-muted">@Html.Raw(Model.InputWaist)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">Объем бедер (см)</h6>
+                                </div>
+                                <span class="text-muted">@Html.Raw(Model.InputHips)</span>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+
+                <div class="col-md-8 order-md-1">
+                    <h2 class="mb-3" style="color:#737448">Введите свои показатели</h2>
+                    <form method="post" action="">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="height">Рост</label>
+                                <input type="number" class="form-control" id="height" name="height" value="" placeholder="см" required="" min="12" max="250" step="0.1" />
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="weight">Масса</label>
+                                <input type="number" class="form-control" id="weight" name="weight" value="" placeholder="кг" required="" min="30" max="150" step="0.1" />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="age">Возраст</label>
+                                <input type="number" class="form-control" id="age" name="age" value="" placeholder="" required="" min="16" max="80" step="0.1" />
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="dender">Пол</label>
+                                <select class="custom-select d-block w-100" id="gender" name="gender" required="">
+                                    <option value="">Выбрать...</option>
+                                    <option>Мужчина</option>
+                                    <option>Женщина</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <hr class="mb-4">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="hardMode" name="hardMode" value="true" onclick="detailed_form();">
+                            <label class="custom-control-label" for="hardMode">Хочу более детальный</label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="height">Объем шеи</label>
+                                <input type="number" class="form-control" disabled="disabled" id="neck" name="neck" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="height">Объем талии</label>
+                                <input type="number" class="form-control" disabled="disabled" id="waist" name="waist" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="height">Объем бедер</label>
+                                <input type="number" class="form-control" disabled="disabled" id="hips" name="hips" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                            </div>
+                        </div>
+                        <hr class="mb-4">
+                        <button class="btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent">Отправить</button>
+                    </form>
+                </div>
+            </div>
+            <br />
+        </div>
+
+        <div class="jumbotron" style="background-color:#F8F4F1; visibility: @Html.Raw(Model.ChartVisibility)">
+            <div class="row">
+
+                <div class="col-md-8 order-1 ">
+                    <h4 class="featurette-heading">
+                        <span style="color:@Html.Raw(Model.ConclusionColor)">@Html.Raw(Model.Conclusion)</span>
+                    </h4>
+                    <div class="chart-container">
+                        <canvas id="chartStacked" style="width:200px; max-width: 500px; height:400px; max-height: 1000px; margin-top: 80px" />
+                    </div>
+                </div>
+                <div class="card-body col-md-4 order-md-2 mb-4 rounded " style="background-color:#EBDED6">
+                    <p class="lead" style=" color:#6B4B3E">@Html.Raw(Model.Recomendations)</p>
+                    <a class="stretched-link" style="visibility:@Html.Raw(Model.LinkVisibility)" href="/Interpolation/Input">Перейти...</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+        <script type="text/javascript">
+ $(function() {
+    var chartName = "chartStacked";
+    var ctx = document.getElementById(chartName).getContext('2d');
+    var XLabels = @Html.Raw(XLabels);
+    var YValues = @Html.Raw(YValues);
+    var label = @Html.Raw(label2);
+    var color = @Html.Raw(Colors);
+    var aux = 0;
+
+    var barChartData = {
+    labels: @Html.Raw(label2),
+    datasets: []
+     }
+
+    XLabels.forEach(
+         function (a, i) {
+             var data = [];
+             YValues.forEach(function (a, i) {
+                 data.push(a[aux]);
+             }
+             );
+             var dataColor = [];
+             color.forEach(function (a, i) {
+                 dataColor.push(a[aux]);
+             }
+             );
+             barChartData.datasets.push({
+                 label: XLabels[aux],
+                 backgroundColor: dataColor,
+                 data: data
+             }
+             );
+             aux++;
+         }
+     );
+
+    var options = {
+        maintainAspectRatio: false,
+        legend: {
+            display: true,
+            position:'right'
+        },
+        scales: {
+            yAxes: [{
+            ticks: {
+                min: 0,
+                beginAtZero: true
+                },
+                stacked: true,
+                gridLines: {
+                    display: true,
+                    color: "rgba(255,99,164,0.2)"
+                }
+            }],
+            xAxes: [{
+                stacked: true,
+                gridLines: {
+                    display: false
+                }
+            }]
+        }
+    };
+
+     var myChart = new Chart(ctx, {
+         options: options,
+         data: barChartData,
+         type: 'bar'
+     });
+
+ });
+        </script>
+        <script>
+            function detailed_form() {
+                checkbox = document.getElementById('hardMode');
+                inputWaist = document.getElementById('waist');
+                inputNeck = document.getElementById('neck');
+                inputHips = document.getElementById('hips');
+                if (checkbox.checked) {
+                    inputWaist.disabled = false;
+                    inputNeck.disabled = false;
+                    inputHips.disabled = false;
+                }
+                else {
+                    inputWaist.disabled = true;
+                    inputNeck.disabled = true;
+                    inputHips.disabled = true;
+                }
+            }
+        </script>
+   
+</div>
