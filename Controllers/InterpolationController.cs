@@ -23,6 +23,7 @@ namespace BodyCore.Controllers
 		{
 			List<KbguListViewModel> kbguList = new List<KbguListViewModel>() { new KbguListViewModel { Week = 0, Kbgu = 0 } }; 
 			List<WeightListViewModel> weightList = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0} };
+			List<FatListViewModel> fatPercentList = new List<FatListViewModel>() { new FatListViewModel { Week = 0, Fat = 0 } };
 
 			List<WeightListViewModel> underfatZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
 			List<WeightListViewModel> athleticZone = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
@@ -37,6 +38,7 @@ namespace BodyCore.Controllers
 			
 			lst.WeightValues = weightList;
 			lst.KbguValues = kbguList;
+			lst.FatValues = fatPercentList;
 			lst.UnderfatZone = underfatZone;
 			lst.AthleticZone = athleticZone;
 			lst.FitZone = fitZone;
@@ -58,6 +60,7 @@ namespace BodyCore.Controllers
 			{
 				List<KbguListViewModel> kbguList = new List<KbguListViewModel>() { new KbguListViewModel { Week = 0, Kbgu = 0 } };
 				List<WeightListViewModel> weightList = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
+				List<FatListViewModel> fatPercentList = new List<FatListViewModel>() { new FatListViewModel { Week = 0, Fat = 0 } };
 
 				ListsResults lst = new ListsResults();
 				ArrayResults arr = new ArrayResults();
@@ -65,6 +68,7 @@ namespace BodyCore.Controllers
 
 				lst.WeightValues = weightList;
 				lst.KbguValues = kbguList;
+				lst.FatValues = fatPercentList;
 				obj.listsResults = lst;
 				obj.arrayResults = arr;
 
@@ -307,6 +311,7 @@ namespace BodyCore.Controllers
 
 				lst.WeightValues = weightList;
 				lst.KbguValues = kbguList;
+				lst.FatValues = fatParcentList;
 
 				lst.UnderfatZone = underfatZone;
 				lst.AthleticZone = athleticZone;
