@@ -14,5 +14,10 @@ namespace BodyCore.Controllers
 		{
 			return View();
 		}
+		[HttpGet]
+		public IActionResult UserAgreement()
+		{
+			return View();
+		}
 	}
 }
