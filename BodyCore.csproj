@@ -14,7 +14,6 @@
     <None Include="wwwroot\css\StyleSheet.css" />
     <None Include="wwwroot\favicon.ico" />
     <None Include="wwwroot\img\bg.png" />
-    <None Include="wwwroot\img\imt.jpg" />
     <None Include="wwwroot\js\bootstrap.min.js" />
     <None Include="wwwroot\js\site.js" />
     <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css" />
