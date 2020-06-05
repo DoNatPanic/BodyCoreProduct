@@ -120,12 +120,32 @@
                                 <input type="number" class="form-control" id="age" name="age" value="" placeholder="" required="" min="16" max="80" step="0.1" />
                             </div>
                         </div>
-
+                        <hr class="mb-4">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="hardMode" name="hardMode" value="true" onclick="detailed_form();">
+                            <label class="custom-control-label lead" for="hardMode">Хочу более детальный расчёт</label>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="neck" class="lead">Объем шеи</label>
+                                <input type="number" class="form-control" disabled="disabled" id="neck" name="neck" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="waist" class="lead">Объем талии</label>
+                                <input type="number" class="form-control" disabled="disabled" id="waist" name="waist" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="hips" class="lead">Объем бедер</label>
+                                <input type="number" class="form-control" disabled="disabled" id="hips" name="hips" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                            </div>
+                        </div>
                         <hr class="mb-4">
 
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" checked="checked" id="disclaimer" name="disclaimer" value="true">
-                            <label class="custom-control-label lead" for="disclaimer">Расчеты носят рекомендательный характер. Вы узнаете время для достижения желаемого веса. Если введенный желаемый вес слишком низкий, вы получите графики только до того момента, пока расчетный вес не достигнет предельного для вас значения. Также хотим предупредить, что лицам младше 16 или старше 80 лет желательно не создавать дефицита питания или проводить его под наблюдением врачей-диетологов.</label>
+                            <label class="custom-control-label lead" for="disclaimer">Я понимаю, что расчеты носят ознакомительный характер. 
+                            Также обещаю, что не собираюсь доводить себя до предельной массы (границы истощения).</label>
                         </div>
 
                         <hr class="mb-4">
@@ -138,29 +158,29 @@
 
             <br /><br /><br />
 
-                <div class="box-body text-center">
-                    <h4 style="color:#8B4513">График массы тела (кг/нед)</h4><br />
-                    <div class="chart-container">
-                        <canvas id="chart_weightGraph" style="width:100%; height:500px"></canvas>
-                    </div>
-
-                    <div class="card-body rounded border-1" style="background-color:#EBDED6; border-color:#A30021">
-                        <p class="lead" style="color:#A30021"><b>@Html.Raw(Model.InUnderfatZone)</b></p>
-                    </div><br />
-
-                    <br /><br />
-                    <h4 style="color:#8B4513">График калорийности рациона (ккал/нед)</h4><br />
-                    <div class="chart-container">
-                        <canvas id="chart_kkalGraph" style="width:100%; height:500px"></canvas>
-                    </div>
-                    <br /><br />
-
-                    <h4 style="color:#8B4513">График процента жира в теле (%/нед)</h4><br />
-                    <div class="chart-container">
-                        <canvas id="chart_fatGraph" style="width:100%; height:500px"></canvas>
-                    </div>
-                    <br /><br />
+            <div class="box-body text-center">
+                <h4 style="color:#8B4513">График массы тела (кг/нед)</h4><br />
+                <div class="chart-container">
+                    <canvas id="chart_weightGraph" style="width:100%; height:500px"></canvas>
                 </div>
+
+                <div class="card-body rounded border-1" style="background-color:#EBDED6; border-color:#A30021">
+                    <p class="lead" style="color:#A30021"><b>@Html.Raw(Model.InUnderfatZone)</b></p>
+                </div><br />
+
+                <br /><br />
+                <h4 style="color:#8B4513">График калорийности рациона (ккал/нед)</h4><br />
+                <div class="chart-container">
+                    <canvas id="chart_kkalGraph" style="width:100%; height:500px"></canvas>
+                </div>
+                <br /><br />
+
+                <h4 style="color:#8B4513">График процента жира в теле (%/нед)</h4><br />
+                <div class="chart-container">
+                    <canvas id="chart_fatGraph" style="width:100%; height:500px"></canvas>
+                </div>
+                <br /><br />
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm table-hover" width="100%">
                     <colgroup>
@@ -393,6 +413,25 @@ var options = {
              });
         });
 
+            </script>
+
+            <script>
+                function detailed_form() {
+                    checkbox = document.getElementById('hardMode');
+                    inputWaist = document.getElementById('waist');
+                    inputNeck = document.getElementById('neck');
+                    inputHips = document.getElementById('hips');
+                    if (checkbox.checked) {
+                        inputWaist.disabled = false;
+                        inputNeck.disabled = false;
+                        inputHips.disabled = false;
+                    }
+                    else {
+                        inputWaist.disabled = true;
+                        inputNeck.disabled = true;
+                        inputHips.disabled = true;
+                    }
+                }
             </script>
         </div>
         </div>

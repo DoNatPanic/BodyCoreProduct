@@ -54,7 +54,7 @@ namespace BodyCore.Controllers
 
 
 		[HttpPost]
-		public IActionResult Input( bool disclaimer, float height, float weight, float dream_weight, float age, string gender, string activity )
+		public IActionResult Input( bool disclaimer, float height, float weight, float dream_weight, float age, string gender, string activity, float waist, float hips, float neck, bool hardMode )
 		{
 			if ( !disclaimer )
 			{
@@ -102,13 +102,26 @@ namespace BodyCore.Controllers
 				
 				AgeGenderFatNorm destObj = new AgeGenderFatNorm();
 
+				float fatPercentDifference = 0;
 				weightList.Add(new WeightListViewModel { Week = 1, Weight = weight });
 				kbgu = mKBGU.getKBGU(weight, height, age, gender, activity)[0];
 				protein = mKBGU.getKBGU(weight, height, age, gender, activity)[1];
 				fat = mKBGU.getKBGU(weight, height, age, gender, activity)[2];
 				carbohydrate = mKBGU.getKBGU(weight, height, age, gender, activity)[3];
 				kbguList.Add(new KbguListViewModel { Week = 1, Kbgu = kbgu, Protein = protein, Fat = fat, Carbohydrate = carbohydrate });
-				fatPercent = mKBGU.fatPercent(height, weight, gender);
+
+				if ( hardMode )
+				{
+					var hard = mKBGU.fatPercentHardMode(height, weight, gender, age, waist, hips, neck);
+					var simple = mKBGU.fatPercent(height, weight, gender);
+					fatPercentDifference = simple > hard ? - Math.Abs(simple - hard) : Math.Abs(simple - hard);
+					fatPercent = hard;
+				}
+				else
+				{
+					fatPercent = mKBGU.fatPercent(height, weight, gender);
+				}
+
 				foreach ( var iter in objList )
 				{
 					if ( age >= iter.AgeMin && age < iter.AgeMax && gender == iter.Gender )
@@ -180,7 +193,7 @@ namespace BodyCore.Controllers
 					weight = ( 1 - mKBGU.getWeightRecession(fatPercent, gender) ) * weight;
 					weightList.Add(new WeightListViewModel { Week = week, Weight = weight });
 
-					fatPercent = mKBGU.fatPercent(height, weight, gender);
+					fatPercent = mKBGU.fatPercent(height, weight, gender) + fatPercentDifference;
 					foreach ( var iter in objList )
 					{
 						if ( age >= iter.AgeMin && age < iter.AgeMax && gender == iter.Gender )
@@ -331,7 +344,7 @@ namespace BodyCore.Controllers
 				obj.InputDreamWeight = dream_weight == 0 ? "" : dream_weight.ToString();
 				obj.AvailableWeight = criticalWeight == 0 ? "" : criticalWeight.ToString();
 				obj.WeeksCount = week.ToString();
-				obj.InUnderfatZone = limitWeight == 0 ? "" : $"Рекомендуем не снижать вес до области истощения. Ваш предельный вес составляет {Math.Round(limitWeight,2)}";
+				obj.InUnderfatZone = limitWeight == 0 ? "" : $"Рекомендуем не снижать вес до области истощения. Ваша предельная масса составляет {Math.Round(limitWeight,2)}";
 
 				return View(obj);
 			}
