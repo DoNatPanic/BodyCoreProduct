@@ -18,5 +18,6 @@ namespace BodyCore.ViewModels
 		public string InputNeck { get; set; } = "";
 		public string InputGender { get; set; } = "";
 		public string ChartVisibility { get; set; } = "hidden";
+		public string Anchor { get; set; }
 	}
 }

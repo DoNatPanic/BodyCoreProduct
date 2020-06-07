@@ -14,6 +14,10 @@
     var overfatZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.listsResults.OverfatZone.Select(x => x.Weight).ToList());
     var obeseZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.listsResults.ObeseZone.Select(x => x.Weight).ToList());
 
+    var WeightGraph_last = Newtonsoft.Json.JsonConvert.SerializeObject(Model.listsResults.WeightValues.Select(x => x.Weight).Last() - 5);
+    var KkalGraph_last = Newtonsoft.Json.JsonConvert.SerializeObject(Model.listsResults.KbguValues.Select(x => x.Kbgu).Last() - 200);
+    var FatGraph_last = Newtonsoft.Json.JsonConvert.SerializeObject(Model.listsResults.FatValues.Select(x => x.Fat).Last() - 5);
+    var anchor = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Anchor);
 }
     <div class="container">
         <div class="jumbotron p-4 p-md-5 rounded " style="margin-top:80px; background-color: #ffffff">
@@ -125,7 +129,7 @@
                             <input type="checkbox" class="custom-control-input" id="hardMode" name="hardMode" value="true" onclick="detailed_form();">
                             <label class="custom-control-label lead" for="hardMode">Хочу более детальный расчёт</label>
                         </div>
-                        <br/>
+                        <br />
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="neck" class="lead">Объем шеи</label>
@@ -144,19 +148,22 @@
 
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" checked="checked" id="disclaimer" name="disclaimer" value="true">
-                            <label class="custom-control-label lead" for="disclaimer">Я понимаю, что расчеты носят ознакомительный характер. 
-                            Также обещаю, что не собираюсь доводить себя до предельной массы (границы истощения).</label>
+                            <label class="custom-control-label lead" for="disclaimer">
+                                Я понимаю, что расчеты носят ознакомительный характер.
+                                Также обещаю, что не собираюсь доводить себя до предельной массы (границы истощения).
+                            </label>
                         </div>
 
                         <hr class="mb-4">
-                        <button class="btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent">Отправить</button>
+
+                        <button class="btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent" > Отправить</button>
 
 
                     </form>
                 </div>
             </div>
 
-            <br /><br /><br />
+            <br id="charts"/><br /><br />
 
             <div class="box-body text-center">
                 <h4 style="color:#8B4513">График массы тела (кг/нед)</h4><br />
@@ -291,7 +298,7 @@ var options = {
                 scales: {
                     yAxes: [{
                         ticks: {
-                            min: 30,
+                            min: @Html.Raw(WeightGraph_last),
                             beginAtZero: false
                         },
                         gridLines: {
@@ -337,7 +344,7 @@ var options = {
                 scales: {
                     yAxes: [{
                         ticks: {
-                            min: 0,
+                            min: @Html.Raw(KkalGraph_last),
                             beginAtZero: false
                         },
                         gridLines: {
@@ -384,7 +391,7 @@ var options = {
                 scales: {
                     yAxes: [{
                         ticks: {
-                            min: 0,
+                            min: @Html.Raw(FatGraph_last),
                             beginAtZero: false
                         },
                         gridLines: {
@@ -414,6 +421,17 @@ var options = {
         });
 
             </script>
+
+
+            @if ( Model.Anchor != null )
+            {
+                <script>
+        $(document).ready(function () {
+    var anchor = document.getElementById('@Model.Anchor');
+    anchor.scrollIntoView(true);
+});
+                </script>
+            }
 
             <script>
                 function detailed_form() {

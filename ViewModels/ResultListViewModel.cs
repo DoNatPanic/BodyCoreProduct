@@ -17,5 +17,6 @@ namespace BodyCore.ViewModels
 		public string InputActivity { get; set; } = "";
 		public string WeeksCount { get; set; } = "";
 		public string InUnderfatZone { get; set; } = "";
+		public string Anchor { get; set; }
 	}
 }

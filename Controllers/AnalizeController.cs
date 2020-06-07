@@ -155,6 +155,7 @@ namespace BodyCore.Controllers
 			commonLst.Recomendations = recomendations;
 			commonLst.LinkVisibility = linkVisibility;
 			commonLst.ChartVisibility = "visible";
+			commonLst.Anchor = "charts";
 			return View(commonLst);
 		}
 	}

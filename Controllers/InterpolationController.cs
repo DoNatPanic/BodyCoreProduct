@@ -345,6 +345,7 @@ namespace BodyCore.Controllers
 				obj.AvailableWeight = criticalWeight == 0 ? "" : criticalWeight.ToString();
 				obj.WeeksCount = week.ToString();
 				obj.InUnderfatZone = limitWeight == 0 ? "" : $"Рекомендуем не снижать вес до области истощения. Ваша предельная масса составляет {Math.Round(limitWeight,2)}";
+				obj.Anchor = "charts";
 
 				return View(obj);
 			}
