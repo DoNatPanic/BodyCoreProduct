@@ -46,9 +46,9 @@
                                 Упрощенная форма не определяет висцеральный жир.
                             </li>
                             <li>
-                                Сложная форма (три доп. поля ввода для шеи, талии и бедер) использует более сложный алгоритм подсчета,
-                                который имеет погрешность на 2-3%, что дает точный результат.
-                                Это особенно актально для спортсменов, чье тело может иметь большую массу, но небольшой процент жира.
+                                Сложная форма (три доп. поля ввода для объемов шеи, талии и бедер) использует более сложный алгоритм подсчета,
+                                который имеет погрешность 2-3%, что дает точный результат.
+                                Это особенно актуально для спортсменов, чье тело может иметь большую массу, но небольшой процент жира.
                                 Дополнительно, вы узнаете, не превышен ли уровень висцерального жира в организме.
                             </li>
                         </ul>
@@ -171,16 +171,18 @@
                 <div class="card-body mb-4 rounded " style="background-color:#EBDED6">
                     <p style=" color:#6B4B3E">@Html.Raw(Model.Recomendations)</p>
                     <a class="stretched-link" style="visibility:@Html.Raw(Model.LinkVisibility)" href="/Interpolation/Input">Перейти...</a>
+                    <p style=" color:#6B4B3E">@Html.Raw(Model.ViscellarFatConclusion)</p>
                 </div>
                 <h4 class="featurette-heading">
                     <span style="color:@Html.Raw(Model.ConclusionColor)">@Html.Raw(Model.Conclusion)</span>
                 </h4>
+                
                 <div class="chart-container">
                     <div class="full-width" style="text-align:center">
                         <canvas id="chartStacked" style=" width:200px; max-width: 300px; height:600px; max-height: 600px; margin-top: 80px; display:inline" />
                     </div>
                 </div>
-            </div>
+</div>
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>

@@ -7,6 +7,7 @@ namespace BodyCore.ViewModels
 		public string Conclusion { get; set; } = "";
 		public string ChartName { get; set; } = "";
 		public string Recomendations { get; set; } = "";
+		public string ViscellarFatConclusion { get; set; } = "";
 		public string LinkVisibility { get; set; } = "hidden";
 		public string ConclusionColor { get; set; } = "rgba(255,255,255,1)";
 		public List<StackedViewModel> CommonModel { get; set; }

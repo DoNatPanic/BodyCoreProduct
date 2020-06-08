@@ -18,11 +18,12 @@ namespace BodyCore.Controllers
 				"rgba(255,215,0,0.4)", "rgba(255,69,0,0.4)", "rgba(255,0,0,0.4)"};
 
 		private static string[] resultsRecomendations = new string[6]
-		{"Вам крайне не рекомендуется снижать вес.", "У вас прекрасная форма, желательно не снижать вес.", 
-				"У вас хорошая форма, можно не снижать вес. Если вы все-таки решили подкорректировать форму, предлагаем воспользоваться нашим помощником.",
-				"Можно немного подкорректировать показатель, воспользоваашись нашим помощником по снижению веса.", 
-				"Рекомендуем подкорректировать форму, воспользовавшись нашим помощником по снижению веса.",
-				"Рекомендуем подкорректировать форму, воспользовавшись нашим помощником по снижению веса."};
+		{"Рассчеты показали, что Вам крайне не рекомендуется снижать вес. Очень низкий процент абдоминальной жировой ткани в организме.", 
+				"У Вас прекрасная форма, желательно не снижать вес. Ваше тело имеет низкий процент абдоминальной жировой ткани.",
+				"У Вас хорошая форма, можно не снижать вес. Нормальный показатель абдоминальной жировой такни в организме.",
+				"Рассчеты показали, что у Вас легка превышен уровень абдоминальной жировой ткани в организме. Вы можете немного подкорректировать показатель, воспользовавшись нашим помощником по снижению веса.",
+				"Рассчеты показали, что процент абдоминальной жировой ткани в организме завышен. Но не стоит отчаиваться! Потому что мы можем Вам помочь. Здесь Вы сможете составить индивидуальный план безопасного и комфортного снижения веса.",
+				"Рассчеты показали, что в организме высокий процент абдоминальной жировой ткани. Однако, не стоит отчаиваться! Потому что Вы можете подкорректировать форму, воспользовавшись нашим помощником по снижению веса. Он составит Вам индивидуальный план безопасного и комфортного снижения веса."};
 
 		List<AgeGenderFatNorm> objList = new List<AgeGenderFatNorm>(){
 			new AgeGenderFatNorm(new float[5] { 20f, 24f, 28f, 33f, 39f }, 16, 40, "Женщина"),
@@ -68,9 +69,9 @@ namespace BodyCore.Controllers
 			{
 				fatPercent = mKBGU.fatPercentHardMode(height, weight, gender, age, waist, hips, neck);
 				float visceralFat = waist / hips;
-				visceralFatConclusion = " Уровень висцерального жира не превышен";
+				visceralFatConclusion = " Уровень висцеральной жировой ткани не превышен";
 				if ( (gender == "Мужчина" && visceralFat > 1f) || ( gender == "Женщина" && visceralFat > 0.85f ) )
-					visceralFatConclusion = " Уровень висцерального жира превышен.";
+					visceralFatConclusion = " Уровень висцеральной жировой ткани превышен.";
 			}
 			else
 			{
@@ -86,7 +87,7 @@ namespace BodyCore.Controllers
 					{
 						result = resultsName[0];
 						colorRGB = resultsColors[0];
-						recomendations = resultsRecomendations[0] + visceralFatConclusion;
+						recomendations = resultsRecomendations[0];
 						linkVisibility = "hidden";
 
 					}
@@ -94,35 +95,35 @@ namespace BodyCore.Controllers
 					{
 						result = resultsName[1];
 						colorRGB = resultsColors[1];
-						recomendations = resultsRecomendations[1] + visceralFatConclusion;
+						recomendations = resultsRecomendations[1];
 						linkVisibility = "hidden";
 					}
 					else if ( fatPercent > destObj.FatIntervals[1] && fatPercent <= destObj.FatIntervals[2] )
 					{
 						result = resultsName[2];
 						colorRGB = resultsColors[2];
-						recomendations = resultsRecomendations[2] + visceralFatConclusion;
-						linkVisibility = "visible";
+						recomendations = resultsRecomendations[2];
+						linkVisibility = "hidden";
 					}
 					else if ( fatPercent > destObj.FatIntervals[2] && fatPercent <= destObj.FatIntervals[3] )
 					{
 						result = resultsName[3];
 						colorRGB = resultsColors[3];
-						recomendations = resultsRecomendations[3] + visceralFatConclusion;
+						recomendations = resultsRecomendations[3];
 						linkVisibility = "visible";
 					}
 					else if ( fatPercent > destObj.FatIntervals[3] && fatPercent <= destObj.FatIntervals[4] )
 					{
 						result = resultsName[4];
 						colorRGB = resultsColors[4];
-						recomendations = resultsRecomendations[4] + visceralFatConclusion;
+						recomendations = resultsRecomendations[4];
 						linkVisibility = "visible";
 					}
 					else if ( fatPercent > destObj.FatIntervals[4] )
 					{
 						result = resultsName[5];
 						colorRGB = resultsColors[5];
-						recomendations = resultsRecomendations[5] + visceralFatConclusion;
+						recomendations = resultsRecomendations[5];
 						linkVisibility = "visible";
 					}
 				}
@@ -153,6 +154,7 @@ namespace BodyCore.Controllers
 			commonLst.ChartName = $"Данные для {gender.ToLower().TrimEnd('а')} вашей возрастной категории";
 			commonLst.ConclusionColor = colorRGB;
 			commonLst.Recomendations = recomendations;
+			commonLst.ViscellarFatConclusion = visceralFatConclusion;
 			commonLst.LinkVisibility = linkVisibility;
 			commonLst.ChartVisibility = "visible";
 			commonLst.Anchor = "charts";
