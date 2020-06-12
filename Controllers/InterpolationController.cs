@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using BodyCore.Models;
 using System.Linq;
 using System;
+using System.Globalization;
 
 namespace BodyCore.Controllers
 {
@@ -103,12 +104,11 @@ namespace BodyCore.Controllers
 				AgeGenderFatNorm destObj = new AgeGenderFatNorm();
 
 				float fatPercentDifference = 0;
-				weightList.Add(new WeightListViewModel { Week = 1, Weight = weight });
-				kbgu = mKBGU.getKBGU(weight, height, age, gender, activity)[0];
+				weightList.Add(new WeightListViewModel { Week = 1, Weight = (float) Math.Round(weight, 2) });
+				//kbgu = mKBGU.getKBGU(weight, height, age, gender, activity)[0]; //это нормаа калорий для поддержания начального веса
 				protein = mKBGU.getKBGU(weight, height, age, gender, activity)[1];
 				fat = mKBGU.getKBGU(weight, height, age, gender, activity)[2];
 				carbohydrate = mKBGU.getKBGU(weight, height, age, gender, activity)[3];
-				kbguList.Add(new KbguListViewModel { Week = 1, Kbgu = kbgu, Protein = protein, Fat = fat, Carbohydrate = carbohydrate });
 
 				if ( hardMode )
 				{
@@ -129,7 +129,7 @@ namespace BodyCore.Controllers
 						destObj = iter;
 						if ( fatPercent <= destObj.FatIntervals[0] )
 						{
-							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = (float) Math.Round(weight, 2) });
 							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
@@ -139,7 +139,7 @@ namespace BodyCore.Controllers
 						else if ( fatPercent > destObj.FatIntervals[0] && fatPercent <= destObj.FatIntervals[1] )
 						{
 							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
-							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = (float) Math.Round(weight, 2) });
 							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
@@ -149,7 +149,7 @@ namespace BodyCore.Controllers
 						{
 							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
-							fitZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							fitZone.Add(new WeightListViewModel { Week = 1, Weight = (float) Math.Round(weight, 2) });
 							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
@@ -159,7 +159,7 @@ namespace BodyCore.Controllers
 							underfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
-							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = (float) Math.Round(weight, 2) });
 							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 						}
@@ -169,7 +169,7 @@ namespace BodyCore.Controllers
 							athleticZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
-							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = (float) Math.Round(weight, 2) });
 							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 						}
 						else if ( fatPercent > destObj.FatIntervals[4] )
@@ -179,19 +179,20 @@ namespace BodyCore.Controllers
 							fitZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							healthyZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
 							overfatZone.Add(new WeightListViewModel { Week = 1, Weight = 0 });
-							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = weight });
+							obeseZone.Add(new WeightListViewModel { Week = 1, Weight = (float) Math.Round(weight, 2) });
 						}
 					}
 				}
-				fatParcentList.Add(new FatListViewModel { Week = 1, Fat = fatPercent });
-
+				fatParcentList.Add(new FatListViewModel { Week = 1, Fat = (float) Math.Round(fatPercent, 2) });
+				kbgu = ( 1 - mKBGU.getKBGUrecession(fatPercent, gender) ) * mKBGU.getKBGU(weight, height, age, gender, activity)[0];
+				kbguList.Add(new KbguListViewModel { Week = 1, Kbgu = (float)Math.Round(kbgu, 2), Protein = protein, Fat = fat, Carbohydrate = carbohydrate });
 				int week = 1;
 				do
 				{
 					week++;
 
 					weight = ( 1 - mKBGU.getWeightRecession(fatPercent, gender) ) * weight;
-					weightList.Add(new WeightListViewModel { Week = week, Weight = weight });
+					weightList.Add(new WeightListViewModel { Week = week, Weight = (float) Math.Round(weight, 2) });
 
 					fatPercent = mKBGU.fatPercent(height, weight, gender) + fatPercentDifference;
 					foreach ( var iter in objList )
@@ -201,7 +202,7 @@ namespace BodyCore.Controllers
 							destObj = iter;
 							if ( fatPercent <= destObj.FatIntervals[0] )
 							{
-								underfatZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								underfatZone.Add(new WeightListViewModel { Week = week, Weight = (float) Math.Round(weight, 2) });
 								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
@@ -211,7 +212,7 @@ namespace BodyCore.Controllers
 							else if ( fatPercent > destObj.FatIntervals[0] && fatPercent <= destObj.FatIntervals[1] )
 							{
 								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
-								athleticZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								athleticZone.Add(new WeightListViewModel { Week = week, Weight = (float) Math.Round(weight, 2) });
 								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
@@ -221,7 +222,7 @@ namespace BodyCore.Controllers
 							{
 								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
-								fitZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								fitZone.Add(new WeightListViewModel { Week = week, Weight = (float) Math.Round(weight, 2) });
 								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
@@ -231,7 +232,7 @@ namespace BodyCore.Controllers
 								underfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
-								healthyZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								healthyZone.Add(new WeightListViewModel { Week = week, Weight = (float) Math.Round(weight, 2) });
 								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 							}
@@ -241,7 +242,7 @@ namespace BodyCore.Controllers
 								athleticZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
-								overfatZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								overfatZone.Add(new WeightListViewModel { Week = week, Weight = (float) Math.Round(weight, 2) });
 								obeseZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 							}
 							else if ( fatPercent > destObj.FatIntervals[4] )
@@ -251,17 +252,17 @@ namespace BodyCore.Controllers
 								fitZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								healthyZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
 								overfatZone.Add(new WeightListViewModel { Week = week, Weight = 0 });
-								obeseZone.Add(new WeightListViewModel { Week = week, Weight = weight });
+								obeseZone.Add(new WeightListViewModel { Week = week, Weight = (float) Math.Round(weight, 2) });
 							}
 						}
 					}
-					fatParcentList.Add(new FatListViewModel { Week = week, Fat = fatPercent });
+					fatParcentList.Add(new FatListViewModel { Week = week, Fat = (float) Math.Round(fatPercent, 2) });
 
 					kbgu = ( 1 - mKBGU.getKBGUrecession(fatPercent, gender) ) * mKBGU.getKBGU(weight, height, age, gender, activity)[0];
 					protein = mKBGU.getKBGU(weight, height, age, gender, activity)[1];
 					fat = mKBGU.getKBGU(weight, height, age, gender, activity)[2];
 					carbohydrate = mKBGU.getKBGU(weight, height, age, gender, activity)[3];
-					kbguList.Add(new KbguListViewModel { Week = week, Kbgu = kbgu, Protein = protein, Fat = fat, Carbohydrate = carbohydrate });
+					kbguList.Add(new KbguListViewModel { Week = week, Kbgu = (float) Math.Round(kbgu, 2), Protein = protein, Fat = fat, Carbohydrate = carbohydrate });
 
 					//расчитываем критическую массу, если процент жира упал до предельной отметки
 					if ( (gender == "Женщина" && fatPercent <= 15f) || ( gender == "Мужчина" && fatPercent < 6.5f ))
@@ -284,10 +285,10 @@ namespace BodyCore.Controllers
 				arr.date = new string[week];
 				arr.WeightValues = new float[week];
 				arr.FatPercentValues = new float[week];
-				arr.KbguValues = new float[week];
-				arr.ProteinValues = new float[week];
-				arr.FatValues = new float[week];
-				arr.CabongydrateValues = new float[week];
+				arr.KbguValues = new int[week];
+				arr.ProteinValues = new int[week];
+				arr.FatValues = new int[week];
+				arr.CabongydrateValues = new int[week];
 
 				int iter0 = 0;
 				foreach ( var it in weightList.Select(x => x.Week) )
@@ -298,28 +299,29 @@ namespace BodyCore.Controllers
 				int iter1 = 0;
 				foreach ( var it in weightList.Select(x => x.Weight) )
 				{
-					arr.WeightValues[iter1] = (float) Math.Round(it, 2);
+					arr.WeightValues[iter1] = (float) Math.Round(it, 1);
 					iter1++;
 				}
 				int iter2 = 0;
 				foreach ( var it in fatParcentList.Select(x => x.Fat) )
 				{
-					arr.FatPercentValues[iter2] = (float) Math.Round(it, 2);
+					arr.FatPercentValues[iter2] = (float) Math.Round(it, 1);
 					iter2++;
 				}
 				int iter3 = 0;
 				foreach ( var it in kbguList )
 				{
-					arr.KbguValues[iter3] = (float) Math.Round(it.Kbgu, 2);
-					arr.ProteinValues[iter3] = (float) Math.Round(it.Protein, 2);
-					arr.FatValues[iter3] = (float) Math.Round(it.Fat, 2);
-					arr.CabongydrateValues[iter3] = (float) Math.Round(it.Carbohydrate, 2);
+					arr.KbguValues[iter3] = (int) Math.Round(Math.Round(it.Kbgu, 2) / 10) * 10;
+					arr.ProteinValues[iter3] = (int) Math.Round(Math.Round(it.Protein, 2) / 10) * 10;
+					arr.FatValues[iter3] = (int) Math.Round(Math.Round(it.Fat, 2) / 10) * 10;
+					arr.CabongydrateValues[iter3] = (int) Math.Round(Math.Round(it.Carbohydrate, 2) / 10) * 10;
 					iter3++;
 				}
 
 				for ( int i = 0; i < week; i++ )
 				{
-					arr.date[i] = DateTime.Now.AddDays(i * 7).ToShortDateString();
+					var datestr = DateTime.Now.AddDays(i * 7).ToString("dd/MM/yy", CultureInfo.InvariantCulture);
+					arr.date[i] = datestr;
 				}
 
 				lst.WeightValues = weightList;
@@ -342,9 +344,9 @@ namespace BodyCore.Controllers
 				obj.InputGender = gender.ToString();
 				obj.InputActivity = activity.ToString();
 				obj.InputDreamWeight = dream_weight == 0 ? "" : dream_weight.ToString();
-				obj.AvailableWeight = criticalWeight == 0 ? "" : criticalWeight.ToString();
+				obj.AvailableWeight = criticalWeight == 0 ? "" : Math.Round(criticalWeight, 2).ToString();
 				obj.WeeksCount = week.ToString();
-				obj.InUnderfatZone = limitWeight == 0 ? "" : $"Рекомендуем не снижать вес до области истощения. Ваша предельная масса составляет {Math.Round(limitWeight,2)}";
+				obj.InUnderfatZone = limitWeight == 0 ? "" : $"Рекомендуем не снижать вес до области истощения. Ваша предельная масса составляет {Math.Round(limitWeight,2)} кг.";
 				obj.Anchor = "charts";
 
 				return View(obj);
