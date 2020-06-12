@@ -1,0 +1,4 @@
+# Группа 1
+User-agent: *
+Disallow: /UserAgreement/
+Sitemap: http://healthyweight.ru/sitemap
