@@ -15,15 +15,5 @@ namespace BodyCore.Controllers
 		{
 			return View();
 		}
-		[HttpGet]
-		public ActionResult Article()
-		{
-			return View();
-		}
-		[HttpGet]
-		public IActionResult UserAgreement()
-		{
-			return View();
-		}
 	}
 }

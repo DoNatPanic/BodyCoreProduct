@@ -55,28 +55,9 @@ namespace BodyCore.Controllers
 
 
 		[HttpPost]
-		public IActionResult Input( bool disclaimer, float height, float weight, float dream_weight, float age, string gender, string activity, float waist, float hips, float neck, bool hardMode )
+		public IActionResult Input( float height, float weight, float dream_weight, float age, string gender, string activity, float waist, float hips, float neck, bool hardMode )
 		{
-			if ( !disclaimer )
-			{
-				List<KbguListViewModel> kbguList = new List<KbguListViewModel>() { new KbguListViewModel { Week = 0, Kbgu = 0 } };
-				List<WeightListViewModel> weightList = new List<WeightListViewModel>() { new WeightListViewModel { Week = 0, Weight = 0 } };
-				List<FatListViewModel> fatPercentList = new List<FatListViewModel>() { new FatListViewModel { Week = 0, Fat = 0 } };
 
-				ListsResults lst = new ListsResults();
-				ArrayResults arr = new ArrayResults();
-				ResultListViewModel obj = new ResultListViewModel();
-
-				lst.WeightValues = weightList;
-				lst.KbguValues = kbguList;
-				lst.FatValues = fatPercentList;
-				obj.listsResults = lst;
-				obj.arrayResults = arr;
-
-				return View(obj);
-			}
-			else
-			{
 				float initWeight = weight;
 				float kbgu;
 				float protein;
@@ -350,7 +331,7 @@ namespace BodyCore.Controllers
 				obj.Anchor = "charts";
 
 				return View(obj);
-			}
+			
 		}
 	}
 }

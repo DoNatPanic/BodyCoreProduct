@@ -10,4 +10,30 @@ img
     height: auto;
 }
 
+#confirmchecked{
+    display: none;
+}
 
+#invalidconfirm {
+    display: none;
+}
+
+#registerbtn{
+    display:none;
+}
+/* Add a green text color and a checkmark when the requirements are right */
+.valid {
+    color: #9BB67C;
+}
+
+/* Add a red text color and an "x" icon when the requirements are wrong */
+.invalid {
+    color: #E0002D;
+}
+
+.checked{
+    display:none
+}
+.unchecked {
+    display: block
+}

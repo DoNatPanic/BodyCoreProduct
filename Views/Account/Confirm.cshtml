@@ -1,0 +1,22 @@
+﻿@{
+    ViewBag.Title = "Подтверждение регистрации";
+}
+
+@model ConfirmAccountViewModel
+
+<div class="container">
+    <div class="jumbotron p-4 p-md-5 rounded lead" style="margin-top:80px; background-color: #ffffff">
+        <h2 class="featurette-heading">
+            <span style="color:#9BB67C">Подтверждение регистрации для @Html.Raw(Model.Username)</span>
+        </h2>
+        <p>
+            Чтобы закончить процедуру регистрации аккаунта, перейдите в электронную почту и подтвердите действия.
+        </p>
+        <p>
+            Перейти в окно
+        </p>
+        <a href="/Account/Login" rel="nofollow">
+            авторизации.
+        </a>
+    </div>
+</div>

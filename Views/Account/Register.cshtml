@@ -1,0 +1,136 @@
+﻿@{
+    ViewBag.Title = "Регистрация";
+}
+
+<div class="container">
+    <div class="jumbotron p-4 p-md-5 rounded" style="margin-top:80px; background-color: #ffffff">
+        <h2 class="featurette-heading">
+            <span style="color:#9BB67C">Регистрация</span>
+        </h2>
+        <h4 class="featurette-heading">
+            <span style="color:#9BB67C">Создание нового пользователя</span>
+        </h4>
+        <form method="post" action="">
+            <div class="row">
+                <div class="col-md-6 order-md-1">
+                    <div>
+                        <label for="username">Ваше имя</label>
+                        <input type="text" class="form-control" id="username" name="username" value="" placeholder="Иван" required="" />
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="" placeholder="example@gmail.com" required="" />
+                    </div>
+                    <div>
+                        <label for="psw">Пароль</label>
+                        <input type="password" class="form-control validate" id="psw" name="password" value="" required=""
+                               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" />
+                    </div>
+                    <div >
+                        <label for="confirmpassword">Подтвердите пароль</label>
+                        <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" value="" required="" />
+                    </div>
+
+                    <div id="confirmarea" class="card-body mb-4 rounded ">
+                        <p id="confirmchecked" style="color:#9BB67C" class="invalid">Пароли совпадают</p>
+                        <p id="invalidconfirm" style="color:#E0002D" class="invalid">Пароли НЕ совпадают</p>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4 order-md-2">
+                    <div id="message" class="card-body mb-4 rounded font-weight-light" style="background-color:#F8F4F1">
+                        <p>
+                            <span style="color:#9BB67C">Пароль должен содержать:</span>
+                        </p>
+                        <p id="letter" class="invalid ">Прописную букву  </p>
+                        <p id="capital" class="invalid">Заглавную букву</p>
+                        <p id="number" class="invalid">Цифру</p>
+                        <p id="length" class="invalid">Как минимум 8 символов</p>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="agree" name="agree" value="true" required="">
+                        <label class="custom-control-label" for="agree">
+                            Согласен 
+                            <a href="/Law/PrivacyPolicy" rel="nofollow">
+                                с политикой конфиденциальности
+                            </a>
+                        </label>
+                    </div>
+                    <button id="registerbtn"  class=" btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent;">Зарегистрироваться</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var password = document.getElementById("psw");
+    var confirmpassword = document.getElementById("confirmpassword");
+    var confirmchecked = document.getElementById("confirmchecked");
+    var invalidconfirm = document.getElementById("invalidconfirm");
+    var registerbtn = document.getElementById("registerbtn");
+    
+    confirmpassword.onkeyup = function () {
+        if (password.value == confirmpassword.value) {
+            confirmchecked.style.display = "block";
+            invalidconfirm.style.display = "none";
+            registerbtn.style.display = "block";
+        } else {
+            confirmchecked.style.display = "none";
+            invalidconfirm.style.display = "block";
+            registerbtn.style.display = "none";
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    var myInput = document.getElementById("psw");
+    var letter = document.getElementById("letter");
+    var capital = document.getElementById("capital");
+    var number = document.getElementById("number");
+    var length = document.getElementById("length");
+
+    // When the user starts to type something inside the password field
+    myInput.onkeyup = function () {
+        // Validate lowercase letters
+        var lowerCaseLetters = /[a-z]/g;
+        if (myInput.value.match(lowerCaseLetters)) {
+            letter.classList.remove("invalid");
+            letter.classList.add("valid");
+        } else {
+            letter.classList.remove("valid");
+            letter.classList.add("invalid");
+        }
+
+        // Validate capital letters
+        var upperCaseLetters = /[A-Z]/g;
+        if (myInput.value.match(upperCaseLetters)) {
+            capital.classList.remove("invalid");
+            capital.classList.add("valid");
+        } else {
+            capital.classList.remove("valid");
+            capital.classList.add("invalid");
+        }
+
+        // Validate numbers
+        var numbers = /[0-9]/g;
+        if (myInput.value.match(numbers)) {
+            number.classList.remove("invalid");
+            number.classList.add("valid");
+        } else {
+            number.classList.remove("valid");
+            number.classList.add("invalid");
+        }
+
+        // Validate length
+        if (myInput.value.length >= 8) {
+            length.classList.remove("invalid");
+            length.classList.add("valid");
+        } else {
+            length.classList.remove("valid");
+            length.classList.add("invalid");
+        }
+    }
+</script>
