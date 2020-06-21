@@ -1,10 +1,12 @@
+using AspNetCore.Identity.PostgreSQL.Context;
+using AspNetCore.Identity.PostgreSQL.Stores;
 using BodyCore.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityRole = AspNetCore.Identity.PostgreSQL.IdentityRole;
 
 namespace BodyCore
 {
@@ -22,14 +24,24 @@ namespace BodyCore
 		{
 			services.AddMvc(option => option.EnableEndpointRouting = false);
 
-			// получаем строку подключения из файла конфигурации
+			/*// получаем строку подключения из файла конфигурации
 			string connection = Configuration.GetConnectionString("DefaultConnection");
 			services.AddDbContext<ApplicationContext>(options =>
 		options.UseNpgsql(connection));
-			services.AddIdentity<User, IdentityRole>()
+			services.AddIdentity<ApplicationUser, IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationContext>()
 				.AddDefaultTokenProviders();
-			//services.AddControllersWithViews();
+			//services.AddControllersWithViews();*/
+			services.AddIdentity<ApplicationUser, IdentityRole>()
+			   .AddUserStore<UserStore<ApplicationUser>>()
+			   .AddRoleStore<RoleStore<IdentityRole>>()
+			   .AddRoleManager<RoleManager<IdentityRole>>()
+				   .AddDefaultTokenProviders();
+
+			// Add application services.
+			IdentityDbConfig.StringConnectionName = "DefaultCon";
+			services.AddMvc();
+			services.AddSingleton(_ => Configuration);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

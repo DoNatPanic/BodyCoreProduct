@@ -26,7 +26,7 @@
                         <input type="password" class="form-control validate" id="psw" name="password" value="" required=""
                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" />
                     </div>
-                    <div >
+                    <div>
                         <label for="confirmpassword">Подтвердите пароль</label>
                         <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" value="" required="" />
                     </div>
@@ -46,18 +46,19 @@
                         <p id="letter" class="invalid ">Прописную букву  </p>
                         <p id="capital" class="invalid">Заглавную букву</p>
                         <p id="number" class="invalid">Цифру</p>
-                        <p id="length" class="invalid">Как минимум 8 символов</p>
+                        <p id="nonalphanumeric" class="invalid">Специальный символ</p>
+                        <p id="length" class="invalid">Как минимум 6 символов</p>
                     </div>
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="agree" name="agree" value="true" required="">
                         <label class="custom-control-label" for="agree">
-                            Согласен 
+                            Согласен с
                             <a href="/Law/PrivacyPolicy" rel="nofollow">
-                                с политикой конфиденциальности
+                                политикой конфиденциальности
                             </a>
                         </label>
                     </div>
-                    <button id="registerbtn"  class=" btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent;">Зарегистрироваться</button>
+                    <button id="registerbtn" class=" btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent;">Зарегистрироваться</button>
                 </div>
 
             </div>
@@ -71,7 +72,7 @@
     var confirmchecked = document.getElementById("confirmchecked");
     var invalidconfirm = document.getElementById("invalidconfirm");
     var registerbtn = document.getElementById("registerbtn");
-    
+
     confirmpassword.onkeyup = function () {
         if (password.value == confirmpassword.value) {
             confirmchecked.style.display = "block";
@@ -90,6 +91,7 @@
     var letter = document.getElementById("letter");
     var capital = document.getElementById("capital");
     var number = document.getElementById("number");
+    var nonalphanumeric = document.getElementById("nonalphanumeric");
     var length = document.getElementById("length");
 
     // When the user starts to type something inside the password field
@@ -124,8 +126,18 @@
             number.classList.add("invalid");
         }
 
+        // Validate nonalphanumeric symbols
+        var specialsymbol = /[^a-zA-Z\d]/g;
+        if (myInput.value.match(specialsymbol)) {
+            nonalphanumeric.classList.remove("invalid");
+            nonalphanumeric.classList.add("valid");
+        } else {
+            nonalphanumeric.classList.remove("valid");
+            nonalphanumeric.classList.add("invalid");
+        }
+
         // Validate length
-        if (myInput.value.length >= 8) {
+        if (myInput.value.length >= 6) {
             length.classList.remove("invalid");
             length.classList.add("valid");
         } else {

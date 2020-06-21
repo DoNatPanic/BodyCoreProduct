@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BodyCore.Models
 {
-	public class ApplicationContext : IdentityDbContext<User>
+	/*public class ApplicationContext : IdentityDbContext<ApplicationUser>
 	{
 		//public override DbSet<User> Users { get; set; }
 		public ApplicationContext( DbContextOptions<ApplicationContext> options )
@@ -15,5 +15,5 @@ namespace BodyCore.Models
 		{
 			Database.EnsureCreated();
 		}
-	}
+	}*/
 }

@@ -16,5 +16,7 @@ namespace BodyCore
 				{
 					webBuilder.UseStartup<Startup>();
 				});
+
+
 	}
 }
