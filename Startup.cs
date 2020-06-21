@@ -4,6 +4,7 @@ using BodyCore.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using IdentityRole = AspNetCore.Identity.PostgreSQL.IdentityRole;
@@ -24,13 +25,13 @@ namespace BodyCore
 		{
 			services.AddMvc(option => option.EnableEndpointRouting = false);
 
-			/*// получаем строку подключения из файла конфигурации
-			string connection = Configuration.GetConnectionString("DefaultConnection");
+			string connection = Configuration.GetConnectionString("DefaultCon");
 			services.AddDbContext<ApplicationContext>(options =>
-		options.UseNpgsql(connection));
-			services.AddIdentity<ApplicationUser, IdentityRole>()
+			options.UseNpgsql(connection));
+			/*services.AddIdentity<ApplicationUser, IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationContext>()
-				.AddDefaultTokenProviders();
+				.AddDefaultTokenProviders();*/
+
 			//services.AddControllersWithViews();*/
 			services.AddIdentity<ApplicationUser, IdentityRole>()
 			   .AddUserStore<UserStore<ApplicationUser>>()

@@ -10,7 +10,7 @@ namespace BodyCore.Models
 		{
 			var emailMessage = new MimeMessage();
 
-			emailMessage.From.Add(new MailboxAddress("Администрация сайта", "weightdecreaseline@gmail.com"));
+			emailMessage.From.Add(new MailboxAddress("HealthyWeight", "weightdecreaseline@gmail.com"));
 			emailMessage.To.Add(new MailboxAddress("", email));
 			emailMessage.Subject = subject;
 			emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)

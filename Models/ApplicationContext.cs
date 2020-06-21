@@ -1,19 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace BodyCore.Models
 {
-	/*public class ApplicationContext : IdentityDbContext<ApplicationUser>
+	public class ApplicationContext : DbContext
 	{
-		//public override DbSet<User> Users { get; set; }
+		public DbSet<User> Users { get; set; }
 		public ApplicationContext( DbContextOptions<ApplicationContext> options )
 			: base(options)
 		{
 			Database.EnsureCreated();
 		}
-	}*/
+	}
 }

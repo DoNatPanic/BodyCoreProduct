@@ -2,18 +2,21 @@
     ViewBag.Title = "Подтверждение регистрации";
 }
 
-@model ConfirmAccountViewModel
-
 <div class="container">
     <div class="jumbotron p-4 p-md-5 rounded lead" style="margin-top:80px; background-color: #ffffff">
-        <h2 class="featurette-heading">
-            <span style="color:#9BB67C">Подтверждение регистрации для пользователя @Html.Raw(Model.Username)</span>
-        </h2>
-        <p>
-            Чтобы закончить процедуру регистрации аккаунта, перейдите в электронную почту и подтвердите действия.
-        </p>
-        <p>
-            Перейти в окно<a href="/Account/Login" rel="nofollow"> авторизации.</a>
-        </p>
+        <form method="get" action="">
+            <h2 class="featurette-heading">
+                <span style="color:#9BB67C">@Html.Raw(Model.Username), спасибо за регистрацию на нашем сайте</span>
+            </h2>
+            <p>
+                Чтобы закончить процедуру, перейдите в электронную почту и подтвердите действия.
+            </p>
+            <p>
+                Перейти в окно<a href="/Account/Login" rel="nofollow"> авторизации.</a>
+            </p>
+            <p>
+                Если вы не получили письмо, проверьте папку "Спам". В случае возникновения проблем, свяжитесь с поддержкой weightdecreaseline@gmail.com
+            </p>
+        </form>
     </div>
 </div>
