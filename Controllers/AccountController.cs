@@ -1,10 +1,14 @@
 ﻿using BodyCore.Models;
+using BodyCore.Models.Email;
 using BodyCore.ViewModels;
 using BodyCore.ViewModels.Account;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BodyCore.Controllers
@@ -16,7 +20,7 @@ namespace BodyCore.Controllers
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
 		public AccountController( UserManager<ApplicationUser> userManager,
-		   SignInManager<ApplicationUser> signInManager, ApplicationContext db)
+		   SignInManager<ApplicationUser> signInManager, ApplicationContext db )
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
@@ -48,29 +52,45 @@ namespace BodyCore.Controllers
 
 			if ( ModelState.IsValid )
 			{
-				var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-				var result = await _userManager.CreateAsync(user, model.Password);
+				IdentityResult result;
+				ApplicationUser user;
+				string code = "";
+				ApplicationUser find_user = await _userManager.FindByEmailAsync(model.Email);
+				if ( find_user != null && find_user.EmailConfirmed == false )
+				{
+					user = find_user;
+					result = await _userManager.UpdateAsync(find_user);
+
+					if ( result.Succeeded ) { 
+						_db.Users.Update(new User { Id = find_user.Id, Name = model.Username, EmailAddres = model.Email });
+						await _db.SaveChangesAsync();
+					}
+				}
+				else
+				{
+					user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+					result = await _userManager.CreateAsync(user, model.Password);
+					var ownTemplateUser = new User { Id = user.Id, Name = model.Username, EmailAddres = model.Email };
+					if ( result.Succeeded )
+					{
+						await _db.Users.AddAsync(ownTemplateUser);
+						await _db.SaveChangesAsync();
+					}
+				}
+
 				if ( result.Succeeded )
 				{
-					//добавление пользователя в таблицу Users
-					User ownTemplateUser = new User { Id = user.Id, Name = model.Username, EmailAddres = model.Email};
-					await _db.Users.AddAsync(ownTemplateUser);
-					await _db.SaveChangesAsync();
-
-					var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-					/*var callbackUrl = Url.Action(
-						"ConfirmEmail",
-						"Account",
-						new { userId = user.Id, code = code },
-						protocol: HttpContext.Request.Scheme);*/
-
+					code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 					var callbackUrl = Url.EmailConfirmationLink(user.Id.ToString(), code, Request.Scheme);
-					EmailService emailService = new EmailService();
-					await emailService.SendEmailAsync(model.Email, "Подтверждение аккаунта",
-						$"Здравствуйте, {model.Username}. Спасибо, что зарегистрировались на нашем сайте! Для подтверждения Вашего Email, перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо. С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a>.");
+					EmailSender _emailSender = new EmailSender();
+					Message message = new Message(new string[] { model.Email }, "Подтверждение аккаунта",
+						$"<p>Здравствуйте, {model.Username}!</p><p>Спасибо, что зарегистрировались на нашем сайте! Для подтверждения Вашего Email, перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо.</p><p>С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a></p>");
+
+					await _emailSender.SendEmailAsync(message);
+					
 					await _signInManager.SignInAsync(user, isPersistent: false);
 					return RedirectToAction("Confirm", model);
+					
 				}
 			}
 			return View(model);
@@ -106,7 +126,7 @@ namespace BodyCore.Controllers
 		[HttpPost]
 		[AllowAnonymous]
 		//[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Login( string email, string password, bool rememberme)
+		public async Task<IActionResult> Login( string email, string password, bool rememberme )
 		{
 			LoginViewModel model = new LoginViewModel();
 			model.Email = email;
@@ -114,27 +134,36 @@ namespace BodyCore.Controllers
 			model.RememberMe = rememberme;
 			if ( ModelState.IsValid )
 			{
-				// This doesn't count login failures towards account lockout
-				// To enable password failures to trigger account lockout, set lockoutOnFailure: true
 				var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
 				if ( result.Succeeded )
 				{
-					return RedirectToAction("Index", "Home");
+					ApplicationUser find_user = await _userManager.FindByEmailAsync(model.Email);
+					if ( find_user != null && find_user.EmailConfirmed == true )
+					{
+						await Authenticate(model.Email);
+						return RedirectToAction("Index", "Home");
+					}
 				}
-				//User account locked out.
 				if ( result.IsLockedOut )
 				{
 					return RedirectToAction("Lockout");
 				}
 				else
 				{
-					//ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 					return View(model);
 				}
 			}
-
-			// If we got this far, something failed, redisplay form
 			return View(model);
+		}
+
+		private async Task Authenticate( string userName )
+		{
+			var claims = new List<Claim>
+			{
+				new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+			};
+			ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
 		}
 
 		[HttpGet]
@@ -160,13 +189,13 @@ namespace BodyCore.Controllers
 					return View();
 				}
 
-				// For more information on how to enable account confirmation and password reset please
-				// visit https://go.microsoft.com/fwlink/?LinkID=532713
 				var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-				var callbackUrl = Url.ResetPasswordCallbackLink(user.Id.ToString(), code, Request.Scheme); 
-				EmailService emailService = new EmailService();
-				await emailService.SendEmailAsync(model.Email, "Сброс пароля",
-					$"Здравствуйте! Вы оставили запрос на сброс пароля. Для продолжения процедуры перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо. С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a>.");
+				var callbackUrl = Url.ResetPasswordCallbackLink(user.Id.ToString(), code, Request.Scheme);
+				EmailSender _emailSender = new EmailSender();
+				Message message = new Message(new string[] { model.Email }, "Сброс пароля",
+					$"<p>Здравствуйте!</p><p>Вы оставили запрос на сброс пароля. Для продолжения процедуры перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо.</p><p>С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a></p>");
+
+				await _emailSender.SendEmailAsync(message);
 
 				return RedirectToAction("ForgotPasswordConfirmation");
 			}
@@ -229,7 +258,6 @@ namespace BodyCore.Controllers
 			return View();
 		}
 
-		//аккаунт заблокирован
 		[HttpGet]
 		[AllowAnonymous]
 		public IActionResult Lockout()
@@ -237,5 +265,16 @@ namespace BodyCore.Controllers
 			return View();
 		}
 
+		public async Task<IActionResult> Logout()
+		{
+			await _signInManager.SignOutAsync();
+			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpGet]
+		public ActionResult UserAccount()
+		{
+			return View();
+		}
 	}
 }

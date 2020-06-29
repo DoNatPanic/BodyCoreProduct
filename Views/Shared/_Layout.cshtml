@@ -17,34 +17,48 @@
     <header>
         <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="backface-visibility:visible; background-color:#6b4b3e">
             <a class="navbar-brand" href="/Home/Index">HealthyWeight</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="true" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample06" aria-controls="navbarsExample06" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse" id="navbarsExampleDefault">
+
+            <div class="collapse navbar-collapse" id="navbarsExample06">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a class="nav-link" href="/Home/Index">Главная</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Analize/GetAnalize">Калькулятор нормы</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/Interpolation/Input">План снижения веса</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Articles/Metabolism">Метаболизм</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="/Account/Register">Регистрация</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Account/Login">Вход</a>
-                    </li>
                 </ul>
+
+                <form class="form-inline my-2 my-md-0">
+                    @if ( User.Identity.IsAuthenticated )
+                    {
+                    <div class="btn-group">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdown06" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white">
+                            Имя
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-md-right">
+                            <a class="dropdown-item" href="#">Профиль</a>
+                            <a class="dropdown-item" href="/Account/UserAccount">Прогресс</a>
+                            <a class="dropdown-item" href="#">Рацион</a>
+
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/Account/Logout">Выйти</a>
+                        </div>
+                    </div>
+                    }
+                    else
+                    {
+                        <a class="nav-link" style="color:white" href="/Account/Login">Войти</a>
+                    }
+                </form>
             </div>
         </nav>
     </header>
-
 
     <div>
         @RenderBody()
@@ -56,9 +70,6 @@
             </a>|
             <a href="/Law/PrivacyPolicy" title="Политика конфиденциальности" rel="nofollow">
                 Политика конфиденциальности
-            </a>|
-            <a href="https://www.instagram.com/heaithy_weight/" title="Подписаться на Instagram-страницу" rel="nofollow">
-                Instagram
             </a>
         </p>
         <p>Контакты для связи: weightdecreaseline@gmail.com</p>

@@ -1,36 +1,40 @@
 ﻿@{
     ViewBag.Title = "Авторизация";
 }
-
 <div class="container">
     <div class="jumbotron p-4 p-md-5 rounded" style="margin-top:80px; background-color: #ffffff">
         <h2 class="featurette-heading">
             <span style="color:#9BB67C">Авторизация</span>
         </h2>
+        <br />
+        <p>Еще нет учетной записи? <a href="/Account/Register" rel="nofollow">Зарегистрироваться</a></p>
         <form method="post" action="">
             <div class="row">
-                <div class="col-md-6 order-md-1">
+                <div class="col-md-5 order-md-1">
                     <div>
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="" placeholder="example@gmail.com" required="" />
+                        <input type="email" class="form-control" id="email" name="email" value="" placeholder="Email адрес" required="" />
                     </div>
+                    <br />
                     <div>
-                        <label for="psw">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password" value="" required=""
+                        <input type="password" class="form-control" id="password" name="password" value="" required="" placeholder="Пароль"
                                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" />
                     </div>
+                    <br />
                     <div>
                         <a href="/Account/ForgotPassword" rel="nofollow">Я забыл пароль</a>
                     </div>
-                    <div>
-                        <input type="checkbox" class="custom-control-input" id="rememberme" name="rememberme">
-                        <label class="custom-control-label lead" for="rememberme">
+                    <br />
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="rememberme" name="rememberme" value="true">
+                        <label class="custom-control-label" for="rememberme">
                             Запомнить меня
                         </label>
                     </div>
+                    <br />
                     <button id="loginbtn" class="btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent;">Войти</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
+

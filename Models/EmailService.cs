@@ -1,12 +1,14 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace BodyCore.Models
 {
+
 	public class EmailService
 	{
-		public async Task SendEmailAsync( string email, string subject, string message )
+		public async Task SendEmailAsync( string email, string subject, string message)
 		{
 			var emailMessage = new MimeMessage();
 

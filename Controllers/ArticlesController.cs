@@ -9,7 +9,7 @@ namespace BodyCore.Controllers
     public class ArticlesController : Controller
     {
 		[HttpGet]
-		public ActionResult Metabolism()
+		public ActionResult FatPercent()
 		{
 			return View();
 		}

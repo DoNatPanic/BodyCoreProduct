@@ -1,18 +1,22 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Xml;
 
 namespace BodyCore.Controllers
 {
 	public class HomeController : Controller
     {
 		[HttpGet]
-		public ActionResult Index()
+		public IActionResult Index()
 		{
+			return View();
+		}
+
+		[HttpGet]
+		public IActionResult Error()
+		{
+			var pathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+			Exception exception = pathFeature?.Error; // Here will be the exception details.
 			return View();
 		}
 	}

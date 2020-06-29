@@ -7,24 +7,22 @@
         <h2 class="featurette-heading">
             <span style="color:#9BB67C">Регистрация</span>
         </h2>
-        <h4 class="featurette-heading">
-            <span style="color:#9BB67C">Создание нового пользователя</span>
-        </h4>
+        <br />
+        <p>Заполните все поля</p>
         <form method="post" action="">
             <div class="row">
-                <div class="col-md-6 order-md-1">
+                <div class="col-md-5 order-md-1">
                     <div>
-                        <label for="username">Ваше имя</label>
-                        <input type="text" class="form-control" id="username" name="username" value="" placeholder="Иван" required="" />
+                        <input type="text" class="form-control" id="username" name="username" value="" placeholder="Ваше имя" required="" />
                     </div>
+                    <br />
                     <div>
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="" placeholder="example@gmail.com" required="" />
+                        <input type="email" class="form-control" id="email" name="email" value="" placeholder="Email адрес" required="" />
                     </div>
                     <div>
                         <label for="psw">Пароль</label>
                         <input type="password" class="form-control validate" id="psw" name="password" value="" required=""
-                               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" />
+                               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" />
                     </div>
                     <div>
                         <label for="confirmpassword">Подтвердите пароль</label>
@@ -58,7 +56,7 @@
                             </a>
                         </label>
                     </div>
-                    <br/>
+                    <br />
                     <button id="registerbtn" class=" btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent;">Зарегистрироваться</button>
                 </div>
 
