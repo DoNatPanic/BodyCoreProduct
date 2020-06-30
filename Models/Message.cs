@@ -24,14 +24,11 @@ namespace BodyCore.Models
 			Subject = subject;
 			Content = content;
 			Attachment = attachment;
-			FileName = attachment.FileDownloadName;
-		}
-
-		public Message( IEnumerable<string> to, string subject, string content)//для писем без вложений
-		{
-			To.AddRange(to.Select(x => new MailboxAddress(x)));
-			Subject = subject;
-			Content = content;
+			if (attachment != null )
+			{
+				FileName = attachment.FileDownloadName;
+			}
+			
 		}
 	}
 }

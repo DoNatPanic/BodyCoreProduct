@@ -17,7 +17,7 @@
                     <img src="~/img/back.jpg" style="width:100%; max-height: 100%" />
                     <div class="container">
                         <div class="carousel-caption text-left">
-                            <h1>Продолжайте прогресс!</h1>
+                            <h1>Создайте план</h1>
                             <br />
                             <p class="lead">
                                 <b>
@@ -26,7 +26,6 @@
                                     приведет вас к поставленной цели!
                                 </b>
                             </p>
-
                             <br /><br />
                             <p><a class="btn btn-lg btn-dark" href="/Interpolation/Input" role="button">Рассчитать</a></p>
                         </div>
@@ -136,17 +135,39 @@
                         Мужчинам необходимо употреблять 0,035 литров воды на 1 кг массы тела, а женщинам — 0,031 литра/кг.
                         Вода помогает удалить отходы из организма, регулирует процесс пищеварения и разносит полезные вещества.
                     </p>
-                    <p class="lead">
-                        Если вы испытываете голод, а возможности поесть нет, попейте воду, чтобы "обмануть" организм. Ведь, как известно,
-                        в состоянии голода организм переходит в режим "энергосбережения" и замедляет метаболизм. Кроме того, потребление воды
-                        поможет снизить аппетит, что обезопасит вас от переедания при следующем приеме пищи.
-                    </p>
+                    <br/>
+                    <h4 class="featurette-heading text-center" style="color:#40B6DD">Рассчитайте, сколько воды вам нужно выпивать</h4>
+                    <div class="col-md order-md-1 lead">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="dender">Пол</label>
+                                <select class="custom-select d-block w-100" id="gender" name="gender">
+                                    <option value="male">Мужчина</option>
+                                    <option value="female">Женщина</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="weight">Вес</label>
+                                <input type="number" class="form-control" name="weight" id="weight" value="" placeholder="кг" />
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label for="water">Результат</label>
+                                <input type="number" class="form-control" name="water" id="water" disabled="disabled" value="" placeholder="литров"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+                    <div class="col-md-3 order-md-1">
+                        <img src="~/img/water.webp" style="max-width:400px" />
+                    </div>
                 </div>
-                <div class="col-md-3 order-md-1">
-                    <img src="~/img/water.webp" style="max-width:400px" />
-                </div>
-            </div>
             <div>
+                <p class="lead">
+                    Если вы испытываете голод, а возможности поесть нет, попейте воду, чтобы "обмануть" организм. Ведь, как известно,
+                    в состоянии голода организм переходит в режим "энергосбережения" и замедляет метаболизм. Кроме того, потребление воды
+                    поможет снизить аппетит, что обезопасит вас от переедания при следующем приеме пищи.
+                </p>
                 <p class="lead">
                     Полезным, но не обязательным является переход на употребление столовой минеральной воды.
                     Она может быть газирована природным способом или искусственно.
@@ -299,3 +320,58 @@
 
 <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script>
 <script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+
+    (function() {
+  function decimalAdjust(type, value, exp) {
+    // Если степень не определена, либо равна нулю...
+    if (typeof exp === 'undefined' || +exp === 0) {
+      return Math[type](value);
+    }
+    value = +value;
+    exp = +exp;
+    // Если значение не является числом, либо степень не является целым числом...
+    if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+      return NaN;
+    }
+    // Сдвиг разрядов
+    value = value.toString().split('e');
+    value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+    // Обратный сдвиг
+    value = value.toString().split('e');
+    return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+  }
+
+  // Десятичное округление к ближайшему
+  if (!Math.round10) {
+    Math.round10 = function(value, exp) {
+      return decimalAdjust('round', value, exp);
+    };
+  }
+  // Десятичное округление вниз
+  if (!Math.floor10) {
+    Math.floor10 = function(value, exp) {
+      return decimalAdjust('floor', value, exp);
+    };
+  }
+  // Десятичное округление вверх
+  if (!Math.ceil10) {
+    Math.ceil10 = function(value, exp) {
+      return decimalAdjust('ceil', value, exp);
+    };
+  }
+})();
+
+
+    var water = document.getElementById("water");
+    var gender = document.getElementById("gender");
+    var weight = document.getElementById("weight");
+
+    weight.onkeyup = function () {
+        water.value = gender.value == "female" ? Math.round10(0.031 * weight.value, -1) : Math.round10(0.035 * weight.value, -1);
+    }
+    gender.onchange = function () {
+        water.value = gender.value == "female" ? Math.round10(0.031 * weight.value, -1) : Math.fround10( 0.035 * weight.value, -1);
+    }
+</script>

@@ -40,6 +40,12 @@ namespace BodyCore.Controllers
 			return View(model);
 		}
 
+		[HttpGet]
+		public IActionResult UserNotFound()
+		{
+			return View();
+		}
+
 		[HttpPost]
 		[AllowAnonymous]
 		//[ValidateAntiForgeryToken]
@@ -84,7 +90,7 @@ namespace BodyCore.Controllers
 					var callbackUrl = Url.EmailConfirmationLink(user.Id.ToString(), code, Request.Scheme);
 					EmailSender _emailSender = new EmailSender();
 					Message message = new Message(new string[] { model.Email }, "Подтверждение аккаунта",
-						$"<p>Здравствуйте, {model.Username}!</p><p>Спасибо, что зарегистрировались на нашем сайте! Для подтверждения Вашего Email, перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо.</p><p>С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a></p>");
+						$"<p>Здравствуйте, {model.Username}!</p><p>Спасибо, что зарегистрировались на нашем сайте! Для подтверждения Вашего Email, перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо.</p><p>С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a></p>", null);
 
 					await _emailSender.SendEmailAsync(message);
 					
@@ -185,15 +191,14 @@ namespace BodyCore.Controllers
 				var user = await _userManager.FindByEmailAsync(model.Email);
 				if ( user == null || !( await _userManager.IsEmailConfirmedAsync(user) ) )
 				{
-					// Don't reveal that the user does not exist or is not confirmed
-					return View();
+					return RedirectToAction("UserNotFound");
 				}
 
 				var code = await _userManager.GeneratePasswordResetTokenAsync(user);
 				var callbackUrl = Url.ResetPasswordCallbackLink(user.Id.ToString(), code, Request.Scheme);
 				EmailSender _emailSender = new EmailSender();
 				Message message = new Message(new string[] { model.Email }, "Сброс пароля",
-					$"<p>Здравствуйте!</p><p>Вы оставили запрос на сброс пароля. Для продолжения процедуры перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо.</p><p>С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a></p>");
+					$"<p>Здравствуйте!</p><p>Вы оставили запрос на сброс пароля. Для продолжения процедуры перейдите по <a href='{callbackUrl}'>ссылке</a>. Если вы не оставляли запрос, удалите это письмо.</p><p>С уважением, служба поддержки сайта <a href='http://healthyweight.ru'>http://healthyweight.ru</a></p>", null);
 
 				await _emailSender.SendEmailAsync(message);
 
