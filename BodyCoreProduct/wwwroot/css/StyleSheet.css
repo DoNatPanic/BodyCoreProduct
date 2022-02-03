@@ -1,0 +1,13 @@
+﻿/*Background pattern from Toptal Subtle Patterns*/
+body {
+    background-image: url(/img/bg.png);
+    background-repeat:repeat;
+  
+}
+img
+{
+    width: 100%;
+    height: auto;
+}
+
+

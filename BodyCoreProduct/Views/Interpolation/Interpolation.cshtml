@@ -1,0 +1,331 @@
+﻿@using BodyCoreProduct.Models
+@{
+    ViewBag.Title = "План снижения веса";
+}
+@{
+    ViewBag.Robots = "all";
+}
+
+@model InterpolationResults
+@{
+
+    var weeks = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.WeeksValues.ToList());
+    var underfatZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.UnderfatZone.Select(x => x.Weight).ToList());
+    var athleticZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.AthleticZone.Select(x => x.Weight).ToList());
+    var fitZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.FitZone.Select(x => x.Weight).ToList());
+    var healthyZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.HealthyZone.Select(x => x.Weight).ToList());
+    var overfatZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.OverfatZone.Select(x => x.Weight).ToList());
+    var obeseZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.ObeseZone.Select(x => x.Weight).ToList());
+    var anchor = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Anchor);
+}
+<div class="container">
+    <div class="jumbotron p-4 p-md-5 rounded " style="margin-top:80px; background-color: #ffffff">
+        <div class="row">
+            <div class="col-md-4 order-md-2 mb-4">
+                <h2 class="d-flex justify-content-between align-items-center mb-3">
+                    <span style="color:#9BB67C">Данные</span>
+                </h2>
+                <form method="post" action="">
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Рост</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.InputHeight)</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Начальная масса</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.InputWeight)</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Желаемый результат</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.InputDreamWeight)</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Критичная масса</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.CriticalWeight)</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Возраст</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.InputAge)</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Пол</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.InputGender)</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Активность</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.InputActivity)</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0 lead">Время до цели (недели)</h6>
+                            </div>
+                            <span class="text-muted">@Html.Raw(Model.WeeksCount)</span>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+            <div class="col-md-8 order-md-1">
+                <h2 class="mb-3" style="color:#737448">Введите свои показатели</h2>
+                <form method="post" action="">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <label for="height" class="lead">Рост</label>
+                            <input type="number" class="form-control" name="height" value="" placeholder="см" required="" min="12" max="250" step="0.1" />
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label for="weight" class="lead">Текущая масса</label>
+                            <input type="number" class="form-control" name="weight" value="" placeholder="кг" required="" min="30" max="150" step="0.1" />
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label for="weight" class="lead">Желаемая масса</label>
+                            <input type="number" class="form-control" name="dream_weight" value="" placeholder="необязательное поле" min="30" max="150" step="0.1" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label for="activity" class="lead">Активность</label>
+                            <select class="custom-select d-block w-100" id="activity" name="activity" required="">
+                                <option value="">Выбрать...</option>
+                                <option>Минимальная</option>
+                                <option>Небольшая</option>
+                                <option>Средняя</option>
+                                <option>Выше среднего</option>
+                                <option>Повышенная</option>
+                                <option>Высокая</option>
+                                <option>Очень высокая</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="dender" class="lead">Пол</label>
+                            <select class="custom-select d-block w-100" id="gender" name="gender" required="">
+                                <option value="">Выбрать...</option>
+                                <option>Мужчина</option>
+                                <option>Женщина</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="age" class="lead">Возраст</label>
+                            <input type="number" class="form-control" id="age" name="age" value="" placeholder="" required="" min="16" max="80" step="0.1" />
+                        </div>
+                    </div>
+                    <hr class="mb-4">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="hardMode" name="hardMode" value="true" onclick="detailed_form();">
+                        <label class="custom-control-label lead" for="hardMode">Хочу более детальный расчёт</label>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="neck" class="lead">Объем шеи</label>
+                            <input type="number" class="form-control" disabled="disabled" id="neck" name="neck" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="waist" class="lead">Объем талии</label>
+                            <input type="number" class="form-control" disabled="disabled" id="waist" name="waist" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="hips" class="lead">Объем бедер</label>
+                            <input type="number" class="form-control" disabled="disabled" id="hips" name="hips" value="" placeholder="см" required="" min="1" max="250" step="0.1" />
+                        </div>
+                    </div>
+                    <hr class="mb-4">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="disclaimer" name="disclaimer" value="true" required="">
+                        <label class="custom-control-label lead" for="disclaimer">
+                            Я понимаю, что расчеты носят ознакомительный характер и
+                            перед применением данных рекомендаций необходимо проконсультироваться с врачом.
+                        </label>
+                    </div>
+                    <hr class="mb-4">
+                    <button class="btn btn-secondary btn-lg btn-block" type="submit" style="color:#ffffff; background-color:#CB9447; border-color:transparent">Отправить</button>
+                </form>
+            </div>
+        </div>
+        <br id="charts" /><br /><br />
+        <div class="box-body text-center">
+            <h4 style="color:#8B4513">График массы тела (кг/нед)</h4><br />
+            <div class="chart-container">
+                <canvas id="chart_weightGraph" style="width:100%; height:500px"></canvas>
+            </div>
+            <div class="card-body rounded border-1" style="background-color:#EBDED6; border-color:#A30021">
+                <p class="lead" style="color:#A30021"><b>@Html.Raw(Model.Recomendations)</b></p>
+            </div><br />
+        </div>
+        <div class="table-responsive text-center">
+            <h4 style="color:#8B4513">Подробный план снижения веса</h4><br />
+            <table class="table table-bordered table-sm table-hover" width="100%">
+                <colgroup>
+                    <col style="width:8%">
+                    <col style="width:16%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                    <col style="width:12%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="text-align: center; color:#8B4513">Неделя</th>
+                        <th style="text-align: center; color:#8B4513">Дата</th>
+                        <th style="text-align: center; color:#8B4513">Масса (кг.)</th>
+                        <th style="text-align: center; color:#8B4513">Ккал</th>
+                        <th style="text-align: center; color:#8B4513">Белки (гр.)</th>
+                        <th style="text-align: center; color:#8B4513">Жиры (гр.)</th>
+                        <th style="text-align: center; color:#8B4513">Углеводы (гр.)</th>
+                        <th style="text-align: center; color:#8B4513">% жира в теле</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.ScheduleValues.WeeksValues.Count; i++)
+                    {
+        <tr>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.WeeksValues[i]
+            </td>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.Date[i]
+            </td>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.WeightValues[i]
+            </td>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.KkalValues[i]
+            </td>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.ProteinValues[i]
+            </td>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.FatValues[i]
+            </td>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.CarbongydrateValues[i]
+            </td>
+            <td class="vcenter" style="text-align: center">
+                @Model.ScheduleValues.FatPercentValues[i]
+            </td>
+        </tr>}
+                </tbody>
+            </table>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript">
+            $(function ()
+            {
+                var chartName = "chart_weightGraph";
+                var ctx = document.getElementById(chartName).getContext('2d');
+                var data =
+                {
+                    labels: @Html.Raw(weeks),
+                    datasets: [
+                        {
+                            label: "Истощение",
+                            backgroundColor: 'rgba(123,104,238,0.4)',
+                            data: @Html.Raw(underfatZone) },
+                        {
+                            label: "Атлетичное телосложение",
+                            backgroundColor: 'rgba(30,144,255,0.4)',
+                            data: @Html.Raw(athleticZone) },
+                        {
+                            label: "Хорошая физическая форма",
+                            backgroundColor: 'rgba(60,179,113,0.4)',
+                            data: @Html.Raw(fitZone) },
+                        {
+                            label: "Средний уровень жира",
+                            backgroundColor: 'rgba(255,215,0,0.4)',
+                            data: @Html.Raw(healthyZone) },
+                        {
+                            label: "Наличие лишнего веса",
+                            backgroundColor: 'rgba(255,69,0,0.4)',
+                            data: @Html.Raw(overfatZone) },
+                        {
+                            label: "Ожирение",
+                            backgroundColor: 'rgba(255,0,0,0.4)',
+                            data: @Html.Raw(obeseZone) }
+                    ]
+                };
+
+                var options = {
+                    maintainAspectRatio: false,
+                    scales: {
+                        yAxes: [
+                            {
+                                ticks: {
+                                    min: 0,
+                                    beginAtZero: false
+                                },
+                                gridLines: {
+                                    display: true,
+                                    color: "rgba(196,158,133,0.2)"
+                                }
+                            }
+                        ],
+                        xAxes: [
+                            {
+                                ticks: {
+                                    min: 0,
+                                    beginAtZero: true
+                                },
+                                gridLines: {
+                                    display: true
+                                }
+                            }
+                        ]
+                    }
+                };
+
+                var myChart = new  Chart(ctx, {
+                    options: options,
+                    data: data,
+                    type: 'line'
+                });
+            });
+        </script>
+
+        <script>
+            function detailed_form() {
+                hardModeCheckbox = document.getElementById('hardMode');
+                waistInput = document.getElementById('waist');
+                neckInput = document.getElementById('neck');
+                hipsInput = document.getElementById('hips');
+                if (hardModeCheckbox.checked) {
+                    waistInput.disabled = false;
+                    neckInput.disabled = false;
+                    hipsInput.disabled = false;
+                }
+                else {
+                    waistInput.disabled = true;
+                    neckInput.disabled = true;
+                    hipsInput.disabled = true;
+                }
+            }
+        </script>
+
+        @if (Model.Anchor != null)
+        {   
+            <script>
+                $(document).ready(function ()
+                {
+                    var anchor = document.getElementById('@Model.Anchor');
+                    anchor.scrollIntoView(true);
+                });
+            </script>
+        }
+    </div>
+</div>

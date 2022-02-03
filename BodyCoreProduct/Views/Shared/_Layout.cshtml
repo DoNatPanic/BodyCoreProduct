@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <meta name="description" content="Здоровое похудение без вреда для здоровья"/>
+    <meta name="keywords" content="похудение, диета, убрать живот, питание, метаболизм"/>
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/StyleSheet.css" rel="stylesheet" type="text/css" />
+    <link href="~/img/favicon-32x32.png" rel="shortcut icon" runat="server" type="image/x-icon" />
+    <link href="~/img/favicon-32x32.png" rel="icon" runat="server" type="image/ico" />
+    <meta name="robots" content="@ViewBag.Robots">
+    <meta name="yandex-verification" content="aa8d8a14abaf3907" />
+    <meta name="google-site-verification" content="XbCbtMDBxZM-rd8S82kZgtzJREC3crGkn-RHr82CO_g" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="backface-visibility:visible; background-color:#6b4b3e">
+            <a class="navbar-brand" href="/Home/Index">HealthyWeight</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="true" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Home/Index">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Analize/Analize">Калькулятор нормы</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Interpolation/Interpolation">План снижения веса</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Home/Article">Метаболизм</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+
+    <div>
+        @RenderBody()
+    </div>
+    <footer class="my-5 pt-1 text-muted text-center text-small">
+        <a class="nav-link" href="/Home/UserAgreement">Пользовательское соглашение</a>
+        <p class="mb-1">weightdecreaseline@gmail.com</p>
+    </footer>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
+</body>
+</html>
