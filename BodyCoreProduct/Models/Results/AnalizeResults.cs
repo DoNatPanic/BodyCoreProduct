@@ -3,54 +3,16 @@ using System.Collections.Generic;
 
 namespace BodyCoreProduct.Models
 {
-	public class AnalizeResults : Base
+	public class AnalizeResults : BaseResults
 	{
 		public string InputWaist { get; set; }
 		public string InputHips { get; set; }
 		public string InputNeck { get; set; }
-		public string Statement { get; set; }
 		public string ViscellarFatConclusion { get; set; }
-		public string LinkVisibility { get; set; }
-		public string ConclusionColor { get; set; }
-		public string Anchor { get; set; }
-		public List<Distribution> Distributions { get; set; }
+		public string LinkVisibility { get; set; } = "hidden";
+		public string ChartVisibility { get; set; } = "hidden";
 
-		public AnalizeResults()
-		{
-			// Пустые введенные показатели
-			InputGender = "";
-			InputAge = "";
-			InputWaist = "";
-			InputHips = "";
-			InputNeck = "";
-			InputHeight = "";
-			InputWeight = "";
-
-			// Пустые строки с рекомендациями
-			ViscellarFatConclusion = "";
-			Statement = "";
-			Recomendations = "";
-			LinkVisibility = "hidden";
-			ConclusionColor = "rgba(255,255,255,1)";
-
-			// Пустой график распределения
-			Distributions = new List<Distribution>()
-			{
-				new Distribution()
-				{
-					DistrName = "",
-					Measurements = new List<SimpleReport>()
-					{
-						new SimpleReport()
-						{
-							DimensionOne = "",
-							ColorRGB = "rgba(0,0,0,0)",
-							Quantity = 0
-						}
-					}
-				}
-			};
-		}
+		public AnalizeResults() { }
 
 		public AnalizeResults(string gender, float age, float waist, float hips, float neck,
 			float height, float weight, bool hardMode)
@@ -76,22 +38,21 @@ namespace BodyCoreProduct.Models
 			AgeGenderClassification selectedCategory = SelectCategory(genderValue, age);
 
 			// Вычисление типа телосложения человека
-			BodyTypeZone bodyTypeZone = CalcBodyType(selectedCategory, fatPercent);
+			BodyType bodyTypeZone = CalcBodyType(selectedCategory, fatPercent);
 
-			// Результат: тип телосложения и % жировой ткани
-			Statement = $"У вас наблюдается {Result[bodyTypeZone].Name.ToLower()}, жировая ткань в организме составляет {Math.Round(fatPercent, 2)} %";
-
-			// Рекомендация
-			Recomendations = Result[bodyTypeZone].Recomendations;
-
-			// Цвет строки рекомендации
-			ConclusionColor = Result[bodyTypeZone].Color;
+			// Результат: тип телосложения и % жировой ткани + Рекомендация
+			Recomendations = $"У вас наблюдается {ResultDict[bodyTypeZone].Name.ToLower()}," +
+				$" жировая ткань в организме составляет {Math.Round(fatPercent, 2)} % " +
+				ResultDict[bodyTypeZone].Recomendations;
 
 			// Свойство видимости ссылки на страницу с составлением плана снижения веса
 			LinkVisibility = GetVisibility(bodyTypeZone);
 
+			// Свойство видимости графика
+			ChartVisibility = "visible";
+
 			// Распределение по типам телосложения в зав-сти от % жировой ткани в организме для выбранной половозрастной категории
-			Distributions = GetDistribution(Result, selectedCategory);
+			Distribution = GetAnalizeDistribution(ResultDict, selectedCategory);
 
 			// Фокус на график
 			Anchor = "charts";
@@ -134,93 +95,43 @@ namespace BodyCoreProduct.Models
 			return selectedCategory;
 		}
 
-		private BodyTypeZone CalcBodyType(AgeGenderClassification selectedCategory, float fatPercent)
+		private BodyType CalcBodyType(AgeGenderClassification selectedCategory, float fatPercent)
 		{
-			BodyTypeZone bodyTypeZone = BodyTypeZone.good;
+			var bodyTypeZone = BodyType.thin;
 
-			if (fatPercent <= selectedCategory.FatIntervals[0])
+			for(int i = BODY_TYPES_CNT - 1; i >= 0; i--)
 			{
-				bodyTypeZone = BodyTypeZone.thin;
-			}
-			else if (fatPercent > selectedCategory.FatIntervals[0] && fatPercent <= selectedCategory.FatIntervals[1])
-			{
-				bodyTypeZone = BodyTypeZone.athletic;
-			}
-			else if (fatPercent > selectedCategory.FatIntervals[1] && fatPercent <= selectedCategory.FatIntervals[2])
-			{
-				bodyTypeZone = BodyTypeZone.good;
-			}
-			else if (fatPercent > selectedCategory.FatIntervals[2] && fatPercent <= selectedCategory.FatIntervals[3])
-			{
-				bodyTypeZone = BodyTypeZone.average;
-			}
-			else if (fatPercent > selectedCategory.FatIntervals[3] && fatPercent <= selectedCategory.FatIntervals[4])
-			{
-				bodyTypeZone = BodyTypeZone.excess;
-			}
-			else if (fatPercent > selectedCategory.FatIntervals[4])
-			{
-				bodyTypeZone = BodyTypeZone.extra;
+				var enm = (BodyType)i;
+				if (fatPercent > selectedCategory.FatIntervals[i])
+				{
+					bodyTypeZone = enm;
+					break;
+				}
 			}
 			return bodyTypeZone;
 		}
 
-		private string GetVisibility(BodyTypeZone bodyTypeZone)
+		private string GetVisibility(BodyType bodyTypeZone)
 		{
 			var visibility = "hidden";
-			if (bodyTypeZone == BodyTypeZone.average || bodyTypeZone == BodyTypeZone.excess || bodyTypeZone == BodyTypeZone.extra)
+			if (bodyTypeZone == BodyType.average || bodyTypeZone == BodyType.excess || bodyTypeZone == BodyType.extra)
 				visibility = "visible";
 			return visibility;
 		}
 
-		private List<Distribution> GetDistribution(Dictionary<BodyTypeZone, CategoryAttributes> result, AgeGenderClassification selectedCategory)
+		private Distribution GetAnalizeDistribution(Dictionary<BodyType, BodyTypeAttributes> result, 
+			AgeGenderClassification selectedCategory)
 		{
-			return new List<Distribution>
-			{
-				new Distribution
-				{
-					DistrName = DistributionName,
+			var distribution = GetDistribution(result);
+			distribution.DistributionName = AnalizeDistributionName;
 
-					Measurements = new List<SimpleReport>()
-					{
-						new SimpleReport() {
-							DimensionOne = result[BodyTypeZone.thin].Name,
-							Quantity = selectedCategory.FatIntervals[0] - 0f,
-							ColorRGB = result[BodyTypeZone.thin].Color
-						},
-						new SimpleReport()
-						{
-							DimensionOne = result[BodyTypeZone.athletic].Name,
-							Quantity = selectedCategory.FatIntervals[1] - selectedCategory.FatIntervals[0],
-							ColorRGB = result[BodyTypeZone.athletic].Color
-						},
-						new SimpleReport()
-						{
-							DimensionOne = result[BodyTypeZone.good].Name,
-							Quantity = selectedCategory.FatIntervals[2] - selectedCategory.FatIntervals[1],
-							ColorRGB = result[BodyTypeZone.good].Color 
-						},
-						new SimpleReport()
-						{
-							DimensionOne = result[BodyTypeZone.average].Name,
-							Quantity = selectedCategory.FatIntervals[3] - selectedCategory.FatIntervals[2],
-							ColorRGB = result[BodyTypeZone.average].Color
-						},
-						new SimpleReport()
-						{
-							DimensionOne = result[BodyTypeZone.excess].Name,
-							Quantity = selectedCategory.FatIntervals[4] - selectedCategory.FatIntervals[3],
-							ColorRGB = result[BodyTypeZone.excess].Color 
-						},
-						new SimpleReport()
-						{
-							DimensionOne = result[BodyTypeZone.extra].Name,
-							Quantity = 100f - selectedCategory.FatIntervals[4],
-							ColorRGB = result[BodyTypeZone.extra].Color
-						}
-					}
-				}
-			};
+			for(int i = 0; i < BODY_TYPES_CNT; i++)
+			{
+				var prevValue = i == 0 ? 0 : distribution.Measurements[i - 1].Quantity;
+				var diff = selectedCategory.FatIntervals[i + 1] - selectedCategory.FatIntervals[i];
+				distribution.Measurements[i].Quantity = diff + prevValue;
+			}
+			return distribution;
 		}
 	}
 }

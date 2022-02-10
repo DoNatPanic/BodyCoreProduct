@@ -1,22 +1,23 @@
-﻿@using BodyCoreProduct.Models
-@{
+﻿@{
     ViewBag.Title = "План снижения веса";
 }
 @{
     ViewBag.Robots = "all";
 }
 
+@using Newtonsoft.Json
 @model InterpolationResults
 @{
-
-    var weeks = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.WeeksValues.ToList());
-    var underfatZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.UnderfatZone.Select(x => x.Weight).ToList());
-    var athleticZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.AthleticZone.Select(x => x.Weight).ToList());
-    var fitZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.FitZone.Select(x => x.Weight).ToList());
-    var healthyZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.HealthyZone.Select(x => x.Weight).ToList());
-    var overfatZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.OverfatZone.Select(x => x.Weight).ToList());
-    var obeseZone = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ScheduleValues.ObeseZone.Select(x => x.Weight).ToList());
-    var anchor = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Anchor);
+    var Zones = new List<string>();
+    for (int i = 0; i < Model.Distribution?.Measurements.Count; i++)
+    {
+        Zones.Add(JsonConvert.SerializeObject(Model.Distribution.Measurements[i].BodyTypeZone.Select(x => x.Weight).ToList()));
+    }
+    var j = 0;
+    var Weeks = JsonConvert.SerializeObject(Model.ScheduleValues?.WeeksValues.ToList());
+    var Colors = JsonConvert.SerializeObject(Model.Distribution?.Measurements.Select(x => x.Color).ToList());
+    var TypeLabels = JsonConvert.SerializeObject(Model.Distribution?.Measurements.Select(x => x.BodyTypeName).ToList());
+    //var DistrName = JsonConvert.SerializeObject(Model.Distribution.DistributionName);
 }
 <div class="container">
     <div class="jumbotron p-4 p-md-5 rounded " style="margin-top:80px; background-color: #ffffff">
@@ -159,14 +160,12 @@
         <div class="box-body text-center">
             <h4 style="color:#8B4513">График массы тела (кг/нед)</h4><br />
             <div class="chart-container">
-                <canvas id="chart_weightGraph" style="width:100%; height:500px"></canvas>
+                <canvas id="myChart" style="width:100%; height:500px"></canvas>
             </div>
-            <div class="card-body rounded border-1" style="background-color:#EBDED6; border-color:#A30021">
-                <p class="lead" style="color:#A30021"><b>@Html.Raw(Model.Recomendations)</b></p>
-            </div><br />
+            <p class="lead" style="color:#A30021"><b>@Html.Raw(Model.Recomendations)</b></p>
         </div>
         <div class="table-responsive text-center">
-            <h4 style="color:#8B4513">Подробный план снижения веса</h4><br />
+            <h4 style="color: #8B4513; margin-top: 50px; ">Подробный план снижения веса</h4><br />
             <table class="table table-bordered table-sm table-hover" width="100%">
                 <colgroup>
                     <col style="width:8%">
@@ -191,34 +190,35 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < Model.ScheduleValues.WeeksValues.Count; i++)
+                    @for (int i = 0; i < Model.ScheduleValues?.WeeksValues.Count; i++)
                     {
-        <tr>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.WeeksValues[i]
-            </td>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.Date[i]
-            </td>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.WeightValues[i]
-            </td>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.KkalValues[i]
-            </td>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.ProteinValues[i]
-            </td>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.FatValues[i]
-            </td>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.CarbongydrateValues[i]
-            </td>
-            <td class="vcenter" style="text-align: center">
-                @Model.ScheduleValues.FatPercentValues[i]
-            </td>
-        </tr>}
+                        <tr>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.WeeksValues[i]
+                            </td>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.Date[i]
+                            </td>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.WeightValues[i]
+                            </td>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.KkalValues[i]
+                            </td>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.ProteinValues[i]
+                            </td>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.FatValues[i]
+                            </td>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.CarbongydrateValues[i]
+                            </td>
+                            <td class="vcenter" style="text-align: center">
+                                @Model.ScheduleValues.FatPercentValues[i]
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -226,75 +226,64 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script type="text/javascript">
-            $(function ()
+            var ctx = document.getElementById("myChart");
+            var weeks = @Html.Raw(Weeks);
+            var typeLabels = @Html.Raw(TypeLabels);
+            var colors = @Html.Raw(Colors);
+            var zones = [];
+            @foreach (var d in Zones)
             {
-                var chartName = "chart_weightGraph";
-                var ctx = document.getElementById(chartName).getContext('2d');
-                var data =
-                {
-                    labels: @Html.Raw(weeks),
-                    datasets: [
-                        {
-                            label: "Истощение",
-                            backgroundColor: 'rgba(123,104,238,0.4)',
-                            data: @Html.Raw(underfatZone) },
-                        {
-                            label: "Атлетичное телосложение",
-                            backgroundColor: 'rgba(30,144,255,0.4)',
-                            data: @Html.Raw(athleticZone) },
-                        {
-                            label: "Хорошая физическая форма",
-                            backgroundColor: 'rgba(60,179,113,0.4)',
-                            data: @Html.Raw(fitZone) },
-                        {
-                            label: "Средний уровень жира",
-                            backgroundColor: 'rgba(255,215,0,0.4)',
-                            data: @Html.Raw(healthyZone) },
-                        {
-                            label: "Наличие лишнего веса",
-                            backgroundColor: 'rgba(255,69,0,0.4)',
-                            data: @Html.Raw(overfatZone) },
-                        {
-                            label: "Ожирение",
-                            backgroundColor: 'rgba(255,0,0,0.4)',
-                            data: @Html.Raw(obeseZone) }
-                    ]
-                };
+                @:zones.push(@Html.Raw(d));
+            }
 
-                var options = {
-                    maintainAspectRatio: false,
-                    scales: {
-                        yAxes: [
-                            {
-                                ticks: {
-                                    min: 0,
-                                    beginAtZero: false
-                                },
-                                gridLines: {
-                                    display: true,
-                                    color: "rgba(196,158,133,0.2)"
-                                }
-                            }
-                        ],
-                        xAxes: [
-                            {
-                                ticks: {
-                                    min: 0,
-                                    beginAtZero: true
-                                },
-                                gridLines: {
-                                    display: true
-                                }
-                            }
-                        ]
+            var chartData = {
+                labels: weeks,
+                datasets: []
+            };
+
+            for (let i = 0; i < zones.length; i++) {
+                chartData.datasets.push(
+                    {
+                        label: typeLabels[i],
+                        backgroundColor: colors[i],
+                        data: zones[i],
                     }
-                };
+                );
+            }
 
-                var myChart = new  Chart(ctx, {
-                    options: options,
-                    data: data,
-                    type: 'line'
-                });
+            var options = {
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                min: 0,
+                                beginAtZero: false
+                            },
+                            gridLines: {
+                                display: true,
+                                color: "rgba(196,158,133,0.2)"
+                            }
+                        }
+                    ],
+                    xAxes: [
+                        {
+                            ticks: {
+                                min: 0,
+                                beginAtZero: true
+                            },
+                            gridLines: {
+                                display: true
+                            }
+                        }
+                    ]
+                }
+            };
+
+            var lineChart = new Chart(ctx, {
+                type: 'line',
+                options: options,
+                data: chartData,
             });
         </script>
 
@@ -318,7 +307,7 @@
         </script>
 
         @if (Model.Anchor != null)
-        {   
+        {
             <script>
                 $(document).ready(function ()
                 {

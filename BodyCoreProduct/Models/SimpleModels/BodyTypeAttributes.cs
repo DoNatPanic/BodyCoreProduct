@@ -1,6 +1,6 @@
 ﻿namespace BodyCoreProduct.Models
 {
-	public struct CategoryAttributes
+	public class BodyTypeAttributes
 	{
 		public string Name;
 		public string Color;

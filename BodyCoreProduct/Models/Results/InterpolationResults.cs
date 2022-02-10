@@ -4,40 +4,23 @@ using System.Globalization;
 
 namespace BodyCoreProduct.Models
 {
-	public class InterpolationResults : Base
+	public class InterpolationResults : BaseResults
 	{
 		public string InputDreamWeight { get; set; }
 		public string CriticalWeight { get; set; }
 		public string LimitWeight { get; set; }
 		public string InputActivity { get; set; }
 		public string WeeksCount { get; set; }
-		public string Anchor { get; set; }
 		public ScheduleValues ScheduleValues { get; set; }
 
-		public InterpolationResults()
-		{
-			// Пустые введенные показатели
-			InputHeight = "";
-			InputWeight = "";
-			InputAge = "";
-			InputGender = "";
-			InputDreamWeight = "";
-			InputActivity = "";
+		private Dictionary<BodyType, List<WeightToTime>> _bodyTypeZonesDict;
 
-			// Пустые строки с результатом
-			CriticalWeight = "";
-			LimitWeight = "";
-			WeeksCount = "";
-			Recomendations = "";
-
-			// Пустые показатели плана снижения веса
-			ScheduleValues = InitScheduleValues();
-		}
+		public InterpolationResults() { }
 
 		public InterpolationResults(float height, float initWeight, float dream_weight, float age, string gender,
 			string activity, float waist, float hips, float neck, bool hardMode)
 		{
-			// Пустые введенные показатели
+			// Отображение введенных показателей
 			InputHeight = height.ToString();
 			InputWeight = initWeight.ToString();
 			InputAge = age.ToString();
@@ -52,14 +35,18 @@ namespace BodyCoreProduct.Models
 			AgeGenderClassification selectedCategory = SelectCategory(genderValue, age);
 
 			// Расчет распределения зон телосложения, результирущих показателей % жировой ткани, веса и кол-ва недель
-			var results = CalcValues(height, initWeight, dream_weight, age, genderValue,
-				activity, waist, hips, neck, hardMode, selectedCategory);
+			var results = CalcSchedule(height, initWeight, dream_weight, age, genderValue,
+				activity, waist, hips, neck, hardMode);
 
 			// График распределения зон телосложений
 			ScheduleValues = results.Item1;
 
+			// Получаем словарь со списками распределения графика похудения по типам телосложения
+			_bodyTypeZonesDict = GetBodyZonesDictionary(height, initWeight, dream_weight, waist, 
+				hips, neck, genderValue, selectedCategory, hardMode);
+
 			// Масса на границе начала зоны истощения
-			LimitWeight = GetLimitWeight(ScheduleValues.UnderfatZone);
+			LimitWeight = GetLimitWeight(_bodyTypeZonesDict[BodyType.thin]);
 
 			// Критическая масса тела (несовместимая с жизнью)
 			CriticalWeight = GetCriticalWeight(genderValue, results.Item2, results.Item3);
@@ -69,6 +56,9 @@ namespace BodyCoreProduct.Models
 
 			// Рекомендации 
 			Recomendations = GetWarning(LimitWeight, CriticalWeight);
+
+			// Распределение веса в зависимости от недель (для каждой зоны телосложения отдельная зависимость)
+			Distribution = GetInterpltnDistribution(ResultDict, _bodyTypeZonesDict);
 
 			// Фокус на график
 			Anchor = "charts";
@@ -89,34 +79,96 @@ namespace BodyCoreProduct.Models
 			return selectedCategory;
 		}
 
-		private ScheduleValues InitScheduleValues()
+		private (float, float) CalcFatPercent(float height, float weight, Gender gender, float waist, float hips, 
+			float neck, bool hardMode)
 		{
-			return new ScheduleValues()
+			float fatPercentDifference = 0;
+
+			float fatPercent;
+			if (hardMode)
 			{
-				WeeksValues = new List<int>(),
-				Date = new List<string>(),
+				var hard = KbguCalculation.FatPercentHardMode(height, gender, waist, hips, neck);
+				var simple = KbguCalculation.FatPercent(height, weight, gender);
+				fatPercent = hard;
 
-				WeightValues = new List<float>(),
-				FatPercentValues = new List<float>(),
+				// Расчет разницы между простым и детальным расчетом
+				fatPercentDifference = simple > hard ? -Math.Abs(simple - hard) : Math.Abs(simple - hard);
+			}
+			else
+			{
+				fatPercent = KbguCalculation.FatPercent(height, weight, gender);
+			}
 
-				KkalValues = new List<int>(),
-				ProteinValues = new List<int>(),
-				FatValues = new List<int>(),
-				CarbongydrateValues = new List<int>(),
-
-				UnderfatZone = new List<WeightToWeek>(),
-				AthleticZone = new List<WeightToWeek>(),
-				FitZone = new List<WeightToWeek>(),
-				HealthyZone = new List<WeightToWeek>(),
-				OverfatZone = new List<WeightToWeek>(),
-				ObeseZone = new List<WeightToWeek>()
-			};
+			return (fatPercent, fatPercentDifference);
 		}
 
-		private (ScheduleValues, float, float, int) CalcValues(float height, float initWeight, float dream_weight, float age, Gender gender,
-			string activity, float waist, float hips, float neck, bool hardMode, AgeGenderClassification selectedCategory)
+		private Dictionary<BodyType, List<WeightToTime>> GetBodyZonesDictionary(float height, float initWeight, float dream_weight, 
+			float waist, float hips, float neck, Gender gender, AgeGenderClassification selectedCategory, bool hardMode)
 		{
-			 ScheduleValues scheduleValues = InitScheduleValues();
+			var dictionary = new Dictionary<BodyType, List<WeightToTime>>()
+			{
+				{ BodyType.thin, BodyTypeZones.UnderfatZone = new List<WeightToTime>() },
+				{ BodyType.athletic, BodyTypeZones.AthleticZone = new List<WeightToTime>() },
+				{ BodyType.good, BodyTypeZones.FitZone = new List<WeightToTime>() },
+				{ BodyType.average, BodyTypeZones.HealthyZone = new List<WeightToTime>() },
+				{ BodyType.excess, BodyTypeZones.OverfatZone = new List<WeightToTime>() },
+				{ BodyType.extra, BodyTypeZones.ObeseZone = new List<WeightToTime>() },
+			};
+
+			float weight = 0;
+			float fatPercent = 0;
+			float fatPercentDifference = 0;
+			int week = 0;
+			do
+			{
+				// Вес и %жировой ткани
+				if (week == 0)
+				{
+					// Начальный вес
+					weight = initWeight;
+
+					// Расчет % жировой ткани
+					var res = CalcFatPercent(height, weight, gender, waist, hips, neck, hardMode);
+					fatPercent = res.Item1;
+					fatPercentDifference = res.Item2;
+				}
+				else
+				{
+					// Пересчет веса
+					weight = (1 - KbguCalculation.GetWeightRecession(fatPercent, gender)) * weight;
+
+					// Персчет % жировой ткани
+					fatPercent = KbguCalculation.FatPercent(height, weight, gender) + fatPercentDifference;
+				}
+
+				// Инициализация элементов списков словаря нулевыми значениями
+				for(int i = 0; i < BODY_TYPES_CNT; i++)
+				{
+					var enm = (BodyType)i;
+					dictionary[enm].Add(new WeightToTime { PeriodId = week, Weight = 0 });
+				}
+
+				// Заполнение элементов списков словаря значениями если вес находится в рассматриваемой зоне
+				for (int i = BODY_TYPES_CNT - 1; i >= 0; i--)
+				{
+					var enm = (BodyType)i;
+					if (fatPercent > selectedCategory.FatIntervals[i])
+					{
+						dictionary[enm][week].Weight = (float)Math.Round(weight, 2);
+						break;
+					}
+				}
+				week++;
+			}
+			while (!IsCriticalFatValue(gender, fatPercent) && weight > dream_weight);
+
+			return dictionary;
+		}
+
+		private (ScheduleValues, float, float, int) CalcSchedule(float height, float initWeight, float dream_weight,
+			float age, Gender gender, string activity, float waist, float hips, float neck, bool hardMode)
+		{
+			ScheduleValues scheduleValues = new ScheduleValues();
 
 			float weight = 0;
 			float fatPercent = 0;
@@ -141,22 +193,12 @@ namespace BodyCoreProduct.Models
 					weight = initWeight;
 
 					// Расчет % жировой ткани
-					if (hardMode)
-					{
-						var hard = KbguCalculation.FatPercentHardMode(height, gender, waist, hips, neck);
-						var simple = KbguCalculation.FatPercent(height, weight, gender);
-						fatPercent = hard;
-
-						// Расчет разницы между простым и детальным расчетом
-						fatPercentDifference = simple > hard ? -Math.Abs(simple - hard) : Math.Abs(simple - hard);
-					}
-					else
-					{
-						fatPercent = KbguCalculation.FatPercent(height, weight, gender);
-					}
+					var res = CalcFatPercent(height, weight, gender, waist, hips, neck, hardMode);
+					fatPercent = res.Item1;
+					fatPercentDifference = res.Item2;
 
 					// Расчет нормы калорий для поддержания веса
-					kkal = KbguCalculation.GetKBGU(weight, height, age, gender, activity)[0];
+					kkal = KbguCalculation.GetKBGU(weight, height, age, gender, ActivityDict[activity])[0];
 				}
 				else
 				{
@@ -167,60 +209,28 @@ namespace BodyCoreProduct.Models
 					fatPercent = KbguCalculation.FatPercent(height, weight, gender) + fatPercentDifference;
 
 					// Пересчет калорий
-					kkal = (1 - KbguCalculation.GetKBGUrecession(fatPercent, gender)) * KbguCalculation.GetKBGU(weight, height, age, gender, activity)[0];
+					var recession = 1 - KbguCalculation.GetKBGUrecession(fatPercent, gender);
+					kkal = recession * KbguCalculation.GetKBGU(weight, height, age, gender, ActivityDict[activity])[0];
 				}
 
 				scheduleValues.WeightValues.Add((float)Math.Round(weight, 2));
 				scheduleValues.FatPercentValues.Add((float)Math.Round(fatPercent, 2));
 
 				// Норма БЖУ
-				protein = KbguCalculation.GetKBGU(weight, height, age, gender, activity)[1];
-				fat = KbguCalculation.GetKBGU(weight, height, age, gender, activity)[2];
-				carbohydrate = KbguCalculation.GetKBGU(weight, height, age, gender, activity)[3];
+				protein = KbguCalculation.GetKBGU(weight, height, age, gender, ActivityDict[activity])[1];
+				fat = KbguCalculation.GetKBGU(weight, height, age, gender, ActivityDict[activity])[2];
+				carbohydrate = KbguCalculation.GetKBGU(weight, height, age, gender, ActivityDict[activity])[3];
 
 				scheduleValues.KkalValues.Add((int)Math.Round(kkal));
 				scheduleValues.ProteinValues.Add((int)Math.Round(protein));
 				scheduleValues.FatValues.Add((int)Math.Round(fat));
 				scheduleValues.CarbongydrateValues.Add((int)Math.Round(carbohydrate));
 
-				// Зоны
-				scheduleValues.UnderfatZone.Add(new WeightToWeek { Week = week, Weight = 0 });
-				scheduleValues.AthleticZone.Add(new WeightToWeek { Week = week, Weight = 0 });
-				scheduleValues.FitZone.Add(new WeightToWeek { Week = week, Weight = 0 });
-				scheduleValues.HealthyZone.Add(new WeightToWeek { Week = week, Weight = 0 });
-				scheduleValues.OverfatZone.Add(new WeightToWeek { Week = week, Weight = 0 });
-				scheduleValues.ObeseZone.Add(new WeightToWeek { Week = week, Weight = 0 });
-
-				if (fatPercent <= selectedCategory.FatIntervals[0])
-				{
-					scheduleValues.UnderfatZone[week].Weight = (float)Math.Round(weight, 2);
-				}
-				else if (fatPercent > selectedCategory.FatIntervals[0] && fatPercent <= selectedCategory.FatIntervals[1])
-				{
-					scheduleValues.AthleticZone[week].Weight = (float)Math.Round(weight, 2);
-				}
-				else if (fatPercent > selectedCategory.FatIntervals[1] && fatPercent <= selectedCategory.FatIntervals[2])
-				{
-					scheduleValues.FitZone[week].Weight = (float)Math.Round(weight, 2);
-				}
-				else if (fatPercent > selectedCategory.FatIntervals[2] && fatPercent <= selectedCategory.FatIntervals[3])
-				{
-					scheduleValues.HealthyZone[week].Weight = (float)Math.Round(weight, 2);
-				}
-				else if (fatPercent > selectedCategory.FatIntervals[3] && fatPercent <= selectedCategory.FatIntervals[4])
-				{
-					scheduleValues.OverfatZone[week].Weight = (float)Math.Round(weight, 2);
-				}
-				else if (fatPercent > selectedCategory.FatIntervals[4])
-				{
-					scheduleValues.ObeseZone[week].Weight = (float)Math.Round(weight, 2);
-				}
-
 				week++;
 			}
 			while (!IsCriticalFatValue(gender, fatPercent) && weight > dream_weight);
 
-			return ( scheduleValues, fatPercent, weight, week );
+			return (scheduleValues, fatPercent, weight, week);
 		}
 
 		private bool IsCriticalFatValue(Gender gender, float fatPercent)
@@ -239,7 +249,7 @@ namespace BodyCoreProduct.Models
 			return criticalWeight;
 		}
 
-		private string GetLimitWeight(List<WeightToWeek> underFatZone)
+		private string GetLimitWeight(List<WeightToTime> underFatZone)
 		{
 			string limitWeight = "";
 			foreach (var t in underFatZone)
@@ -268,6 +278,21 @@ namespace BodyCoreProduct.Models
 				}
 			}
 			return warning;
+		}
+
+		private Distribution GetInterpltnDistribution(Dictionary<BodyType, BodyTypeAttributes> result, 
+			Dictionary<BodyType, List<WeightToTime>> dictionary)
+		{
+			var distribution = GetDistribution(result);
+			distribution.DistributionName = InterpltnDistributionName;
+
+			for (int i = 0; i < BODY_TYPES_CNT; i++)
+			{
+				var enm = (BodyType)i;
+				distribution.Measurements[i].BodyTypeZone = dictionary[enm];
+			}
+
+			return distribution;
 		}
 	}
 }

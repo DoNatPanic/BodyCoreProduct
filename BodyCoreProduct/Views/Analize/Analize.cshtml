@@ -1,17 +1,13 @@
-﻿@using BodyCoreProduct.Models
-@{
-    ViewBag.Title = "Определить норму веса";
-}
-@{
-    ViewBag.Robots = "all";
-}
+﻿@{ ViewBag.Title = "Определить норму веса"; }
+@{ ViewBag.Robots = "all"; }
 
+@using Newtonsoft.Json
 @model AnalizeResults
-@{
-    var XLabels = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Distributions.FirstOrDefault().Measurements.Select(x => x.DimensionOne).ToList());
-    var YValues = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Distributions.Select(x => x.Measurements.Select(y => y.Quantity)).ToList());
-    var Colors = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Distributions.Select(x => x.Measurements.Select(y => y.ColorRGB)).ToList());
-    var label2 = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Distributions.Select(x => x.DistrName).ToList());
+@{ 
+    var XLabels = JsonConvert.SerializeObject(Model.Distribution?.Measurements.Select(x => x.BodyTypeName).ToList());
+    var YValues = JsonConvert.SerializeObject(Model.Distribution?.Measurements.Select(y => y.Quantity).ToList());
+    var Colors = JsonConvert.SerializeObject(Model.Distribution?.Measurements.Select(y => y.Color).ToList());
+    var DistrName = JsonConvert.SerializeObject(Model.Distribution?.DistributionName);
 }
 
 <div class="container">
@@ -23,12 +19,12 @@
                     Здесь вы сможете рассчитать процент жировой ткани в вашем организме. Для чего это делается?
                     На основании этого показателя вы сможете понять тип вашего телосложения:
                     <ul class="lead">
-                        <li>Истощение</li>
-                        <li>Атлетическое телосложение</li>
-                        <li>Хорошая физическая форма</li>
-                        <li>Средний уровень жира</li>
-                        <li>Наличие лишнего веса</li>
-                        <li>Ожирение</li>
+                        <li>@BaseResults.BodyTypeZonesDescrDict[BodyType.thin]</li>
+                        <li>@BaseResults.BodyTypeZonesDescrDict[BodyType.athletic]</li>
+                        <li>@BaseResults.BodyTypeZonesDescrDict[BodyType.good]</li>
+                        <li>@BaseResults.BodyTypeZonesDescrDict[BodyType.average]</li>
+                        <li>@BaseResults.BodyTypeZonesDescrDict[BodyType.excess]</li>
+                        <li>@BaseResults.BodyTypeZonesDescrDict[BodyType.extra]</li>
                     </ul>
                 </p>
             </div>
@@ -169,16 +165,13 @@
             <br />
         </div>
         <div id="charts" class="jumbotron text-center lead" style="background-color:#F8F4F1;">
-            <p style=" color:#6B4B3E">@Html.Raw(Model.Recomendations)</p>
+            <p style=" color:#6B4B3E"><b>@Html.Raw(Model.Recomendations)</b></p>
             <a class="stretched-link" style="visibility:@Html.Raw(Model.LinkVisibility)" href="/Interpolation/Interpolation">Перейти...</a>
             <p style=" color:#6B4B3E">@Html.Raw(Model.ViscellarFatConclusion)</p>
-            <h4 class="featurette-heading">
-                <span style="color:@Html.Raw(Model.ConclusionColor)">@Html.Raw(Model.Statement)</span>
-            </h4>
 
             <div class="chart-container">
                 <div class="full-width" style="text-align:center">
-                    <canvas id="chartStacked" style=" width:200px; max-width: 300px; height:600px; max-height: 600px; margin-top: 80px; display:inline" />
+                    <canvas id="myChart" style="visibility:@Html.Raw(Model.ChartVisibility); width: 400px; max-width: 600px; height: 300px; max-height: 400px; margin-top: 10px; display: inline" />
                 </div>
             </div>
         </div>
@@ -186,87 +179,60 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+       var xLabels = @Html.Raw(XLabels);
+       var yValues = @Html.Raw(YValues);
+       var colors = @Html.Raw(Colors);
+       var distrName = @Html.Raw(DistrName);
+       var ctx = document.getElementById("myChart");
 
-    <script type="text/javascript">
-        $(function ()
-        {
-            var chartName = "chartStacked";
-            var ctx = document.getElementById(chartName).getContext('2d');
-            var XLabels = @Html.Raw(XLabels);
-            var YValues = @Html.Raw(YValues);
-            var label = @Html.Raw(label2);
-            var color = @Html.Raw(Colors);
-            var aux = 0;
-        
-            var barChartData = {
-                labels: @Html.Raw(label2),
-                datasets: []
+       var chartOptions = {
+           title: {
+               display: true,
+               text: distrName,
+           },
+           legend: {
+               display: false,
+               position: 'bottom'
+           },
+            scales: {
+                xAxes: [
+                    {
+                        ticks: {
+                            min: 0,
+                            beginAtZero: true
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: '% жировой ткани в организме'
+                        }
+                    }
+                ],
+            },
+            elements: {
+                rectangle: {
+                    borderSkipped: 'left',
+                }
             }
+        };
 
-             XLabels.forEach(
-                 function (a, i) {
-                     var data = [];
-                     YValues.forEach(function (a, i) {
-                         data.push(a[aux]);
-                     });
-                     var dataColor = [];
-                     color.forEach(function (a, i) {
-                         dataColor.push(a[aux]);
-                     });
-                     barChartData.datasets.push(
-                         {
-                             label: XLabels[aux],
-                            backgroundColor: dataColor,
-                            data: data
-                         }  
-                     );
-                     aux++;
-                }
-            );
-
-            var options = {
-                maintainAspectRatio: false,
-                legend: {
-                    display: true,
-                    position:'bottom'
-                },
-                scales: {
-                    yAxes: [
-                        {
-                            ticks: {
-                                min: 0,
-                                beginAtZero: true
-                            },
-                            stacked: true,
-                            gridLines: {
-                                display: true,
-                                color: "rgba(255,99,164,0.2)"
-                            }
-                        }
-                    ],
-                    xAxes: [
-                        {
-                            stacked: true,
-                            gridLines: {
-                                display: false
-                            }
-                        }
-                    ]
-                }
-            };
-
-            var myChart = new Chart(ctx, {
-                options: options,
-                data: barChartData,
-                type: 'bar'
-            });
-
+        var barChart = new Chart(ctx, {
+            type: 'horizontalBar',
+            data: {
+                labels: xLabels,
+                datasets: [{
+                    data: yValues,
+                    backgroundColor: colors
+                }]
+            },
+            options: chartOptions
         });
     </script>
 
+
+
     <script>
-        function detailed_form()
-        {
+        function detailed_form() {
             checkbox = document.getElementById('hardMode');
             inputWaist = document.getElementById('waist');
             inputNeck = document.getElementById('neck');
@@ -284,13 +250,13 @@
         }
     </script>
 
-    @if ( Model.Anchor != null )
-     {
-         <script>
-         $(document).ready(function () {
-             var anchor = document.getElementById('@Model.Anchor');
-             anchor.scrollIntoView(true);
-         });
-         </script>
-     }
+    @if (Model.Anchor != null)
+    {
+        <script>
+             $(document).ready(function () {
+                 var anchor = document.getElementById('@Model.Anchor');
+                 anchor.scrollIntoView(true);
+             });
+        </script>
+    }
 </div>
