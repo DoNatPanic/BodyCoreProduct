@@ -1,12 +1,18 @@
 version: '3.5'
 
 services:
-  app:
+  body_core_app:
     build:
       context: ./
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
     container_name: body_core
+    networks:
+      - math_backend_internal_net
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+
+networks:
+  math_backend_internal_net:
+    external: true
